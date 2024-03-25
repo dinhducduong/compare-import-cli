@@ -1,0 +1,28 @@
+{
+  "magento-edition": "EE",
+  "magento-version": "2.4.4",
+  "archive-artefacts": true,
+  "debug-mode": false,
+  "strict-mode": true,
+  "username": "admin",
+  "entity-type-code": "catalog_product",
+  "source-dir": "var/pacemaker/import",
+  "target-dir": "var/pacemaker/import",
+  "empty-attribute-value-constant": "__EMPTY__VALUE__",
+  "shortcuts": [],
+  "listeners": [],
+  "databases": [],
+  "loggers": [],
+  "operations": {
+    "general": [],
+    "ce": [],
+    "ee": []
+  },
+  "api": {
+    "magento-domain": ""
+  },
+  "config-output": false,
+  "delimiter": ",",
+  "enclosure": "\"",
+  "escape": "\u0000"
+}

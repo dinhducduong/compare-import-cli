@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <service id="import_product_grouped_ee.observer.grouped.product.relation" class="TechDivision\Import\Product\Grouped\Ee\Observers\EeGroupedProductRelationObserver">
+            <argument type="service" id="import_product_grouped.processor.product.grouped"/>
+        </service>
+        <service id="import_product_grouped_ee.observer.grouped.product.relation.update" class="TechDivision\Import\Product\Grouped\Ee\Observers\EeGroupedProductRelationUpdateObserver">
+            <argument type="service" id="import_product_grouped.processor.product.grouped"/>
+        </service>
+
+        <service id="import_product_grouped_ee.subject.grouped" class="TechDivision\Import\Product\Grouped\Ee\Subjects\EeGroupedSubject" shared="false">
+            <argument type="service" id="import.processor.registry"/>
+            <argument type="service" id="import.generator.core.config.data.uid"/>
+            <argument type="service" id="loggers"/>
+            <argument type="service" id="import.events.emitter"/>
+            <argument type="service" id="import_product.loader.media.roles"/>
+            <argument type="service" id="import_product.utils.entity.type.code.mapping"/>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the replace operation.
+         |-->
+        <service id="import_product_grouped_ee.observer.composite.replace" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_product_grouped_ee.observer.grouped.product.relation" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the add-update operation.
+         |-->
+        <service id="import_product_grouped_ee.observer.composite.add_update" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_product_grouped.observer.sku.entity.id.mapping" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_grouped_ee.observer.grouped.product.relation.update" type="service"/>
+            </call>
+        </service>
+
+    </services>
+
+</container>

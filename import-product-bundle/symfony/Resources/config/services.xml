@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="import_product_bundle.param.sku.column.name" type="constant">TechDivision\Import\Product\Bundle\Utils\ColumnKeys::BUNDLE_VALUE_SKU</parameter>
+    </parameters>
+
+    <services>
+
+        <!--
+         | The DI configuration for the entity mergers
+         |-->
+        <service id="import_product_bundle.loader.header.mapping.option" class="TechDivision\Import\Loaders\EntityTypeHeaderMappingLoader">
+            <argument type="service" id="import.loader.header.mapping"/>
+            <argument type="constant">TechDivision\Import\Product\Bundle\Utils\EntityTypeCodes::CATALOG_PRODUCT_BUNDLE_OPTION</argument>
+        </service>
+        <service id="import_product_bundle.loader.header.mapping.selection" class="TechDivision\Import\Loaders\EntityTypeHeaderMappingLoader">
+            <argument type="service" id="import.loader.header.mapping"/>
+            <argument type="constant">TechDivision\Import\Product\Bundle\Utils\EntityTypeCodes::CATALOG_PRODUCT_BUNDLE_SELECTION</argument>
+        </service>
+        <service id="import_product_bundle.entity.merger.empty.columns.option" class="TechDivision\Import\Observers\EntityMergers\CleanUpColumnsEntityMerger">
+            <argument type="service" id="import_product_bundle.loader.header.mapping.option"/>
+        </service>
+        <service id="import_product_bundle.entity.merger.empty.columns.selection" class="TechDivision\Import\Observers\EntityMergers\CleanUpColumnsEntityMerger">
+            <argument type="service" id="import_product_bundle.loader.header.mapping.selection"/>
+        </service>
+        <service id="import_product_bundle.entity.merger.composite.option" class="TechDivision\Import\Observers\EntityMergers\GenericCompositeEntityMerger">
+            <call method="append">
+                <argument type="service" id="import_product_bundle.entity.merger.empty.columns.option"/>
+            </call>
+        </service>
+        <service id="import_product_bundle.entity.merger.composite.selection" class="TechDivision\Import\Observers\EntityMergers\GenericCompositeEntityMerger">
+            <call method="append">
+                <argument type="service" id="import_product_bundle.entity.merger.empty.columns.selection"/>
+            </call>
+        </service>
+
+        <service id="import_product_bundle.repository.sql.statement" class="TechDivision\Import\Product\Bundle\Repositories\SqlStatementRepository">
+            <argument type="service" id="import.util.sql.compilers"/>
+        </service>
+        <service id="import_product_bundle.repository.bundle.option" class="TechDivision\Import\Product\Bundle\Repositories\BundleOptionRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.sql.statement"/>
+        </service>
+        <service id="import_product_bundle.repository.bundle.option.value" class="TechDivision\Import\Product\Bundle\Repositories\BundleOptionValueRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.sql.statement"/>
+        </service>
+        <service id="import_product_bundle.repository.bundle.selection.price" class="TechDivision\Import\Product\Bundle\Repositories\BundleSelectionPriceRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.sql.statement"/>
+        </service>
+        <service id="import_product_bundle.repository.bundle.selection" class="TechDivision\Import\Product\Bundle\Repositories\BundleSelectionRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.sql.statement"/>
+        </service>
+
+        <!--
+         | The DI action processor configuration
+         |-->
+        <service id="import_product_bundle.action.processor.product.bundle.option.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Bundle\Utils\SqlStatementKeys::CREATE_PRODUCT_BUNDLE_OPTION</argument>
+            </argument>
+        </service>
+        <service id="import_product_bundle.action.processor.product.bundle.option.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Bundle\Utils\SqlStatementKeys::UPDATE_PRODUCT_BUNDLE_OPTION</argument>
+            </argument>
+        </service>
+        <service id="import_product_bundle.action.processor.product.bundle.selection.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Bundle\Utils\SqlStatementKeys::CREATE_PRODUCT_BUNDLE_SELECTION</argument>
+            </argument>
+        </service>
+        <service id="import_product_bundle.action.processor.product.bundle.selection.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Bundle\Utils\SqlStatementKeys::UPDATE_PRODUCT_BUNDLE_SELECTION</argument>
+            </argument>
+        </service>
+        <service id="import_product_bundle.action.processor.product.bundle.option.value.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Bundle\Utils\SqlStatementKeys::CREATE_PRODUCT_BUNDLE_OPTION_VALUE</argument>
+            </argument>
+        </service>
+        <service id="import_product_bundle.action.processor.product.bundle.selection.price.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Bundle\Utils\SqlStatementKeys::CREATE_PRODUCT_BUNDLE_SELECTION_PRICE</argument>
+            </argument>
+        </service>
+        <service id="import_product_bundle.action.processor.product.bundle.selection.price.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Bundle\Utils\SqlStatementKeys::UPDATE_PRODUCT_BUNDLE_SELECTION_PRICE</argument>
+            </argument>
+        </service>
+
+        <service id="import_product_bundle.action.product.bundle.option" class="TechDivision\Import\Dbal\Collection\Actions\GenericIdentifierAction">
+            <argument type="service" id="import_product_bundle.action.processor.product.bundle.option.create"/>
+            <argument type="service" id="import_product_bundle.action.processor.product.bundle.option.update"/>
+            <argument type="service" id="import_product_bundle.action.processor.product.bundle.option.delete" on-invalid="ignore"/>
+            <argument type="constant">TechDivision\Import\Product\Bundle\Utils\MemberNames::OPTION_ID</argument>
+        </service>
+        <service id="import_product_bundle.action.product.bundle.selection" class="TechDivision\Import\Dbal\Collection\Actions\GenericIdentifierAction">
+            <argument type="service" id="import_product_bundle.action.processor.product.bundle.selection.create"/>
+            <argument type="service" id="import_product_bundle.action.processor.product.bundle.selection.update"/>
+            <argument type="service" id="import_product_bundle.action.processor.product.bundle.selection.delete" on-invalid="ignore"/>
+            <argument type="constant">TechDivision\Import\Product\Bundle\Utils\MemberNames::SELECTION_ID</argument>
+        </service>
+        <service id="import_product_bundle.action.product.bundle.option.value" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_product_bundle.action.processor.product.bundle.option.value.create"/>
+        </service>
+        <service id="import_product_bundle.action.product.bundle.selection.price" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_product_bundle.action.processor.product.bundle.selection.price.create"/>
+            <argument type="service" id="import_product_bundle.action.processor.product.bundle.selection.price.update"/>
+        </service>
+
+        <service id="import_product_bundle.loader.raw.entity" class="TechDivision\Import\Product\Bundle\Loaders\RawEntityLoader">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import.loader.column.metadata"/>
+            <argument type="service" id="import.loader.raw.entity"/>
+        </service>
+
+        <service id="import_product_bundle.processor.product.bundle" class="TechDivision\Import\Product\Bundle\Services\ProductBundleProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_bundle.repository.bundle.option"/>
+            <argument type="service" id="import_product_bundle.repository.bundle.option.value"/>
+            <argument type="service" id="import_product_bundle.repository.bundle.selection"/>
+            <argument type="service" id="import_product_bundle.repository.bundle.selection.price"/>
+            <argument type="service" id="import_product.repository.product.relation"/>
+            <argument type="service" id="import_product_bundle.action.product.bundle.option"/>
+            <argument type="service" id="import_product_bundle.action.product.bundle.option.value"/>
+            <argument type="service" id="import_product_bundle.action.product.bundle.selection"/>
+            <argument type="service" id="import_product_bundle.action.product.bundle.selection.price"/>
+            <argument type="service" id="import_product.action.product.relation"/>
+            <argument type="service" id="import_product_bundle.loader.raw.entity"/>
+        </service>
+
+        <service id="import_product_bundle.callback.bundle.price.view" class="TechDivision\Import\Product\Bundle\Callbacks\BundlePriceViewCallback"/>
+        <service id="import_product_bundle.callback.bundle.shipment.type" class="TechDivision\Import\Product\Bundle\Callbacks\BundleShipmentTypeCallback"/>
+        <service id="import_product_bundle.callback.bundle.type" class="TechDivision\Import\Product\Bundle\Callbacks\BundleTypeCallback"/>
+
+        <service id="import_product_bundle.observer.product.bundle" class="TechDivision\Import\Product\Bundle\Observers\ProductBundleObserver"/>
+        <service id="import_product_bundle.observer.bundle.option" class="TechDivision\Import\Product\Bundle\Observers\BundleOptionObserver">
+            <argument type="service" id="import_product_bundle.processor.product.bundle"/>
+            <argument type="service" id="import.observer.dynamic.attribute.loader"/>
+            <argument type="service" id="import_product_bundle.entity.merger.composite.option"/>
+        </service>
+        <service id="import_product_bundle.observer.bundle.option.update" class="TechDivision\Import\Product\Bundle\Observers\BundleOptionUpdateObserver">
+            <argument type="service" id="import_product_bundle.processor.product.bundle"/>
+            <argument type="service" id="import.observer.dynamic.attribute.loader"/>
+            <argument type="service" id="import_product_bundle.entity.merger.composite.option"/>
+        </service>
+        <service id="import_product_bundle.observer.bundle.selection" class="TechDivision\Import\Product\Bundle\Observers\BundleSelectionObserver">
+            <argument type="service" id="import_product_bundle.processor.product.bundle"/>
+            <argument type="service" id="import.observer.dynamic.attribute.loader"/>
+            <argument type="service" id="import_product_bundle.entity.merger.composite.selection"/>
+        </service>
+        <service id="import_product_bundle.observer.bundle.selection.update" class="TechDivision\Import\Product\Bundle\Observers\BundleSelectionUpdateObserver">
+            <argument type="service" id="import_product_bundle.processor.product.bundle"/>
+            <argument type="service" id="import.observer.dynamic.attribute.loader"/>
+            <argument type="service" id="import_product_bundle.entity.merger.composite.selection"/>
+        </service>
+        <service id="import_product_bundle.observer.bundle.option.value" class="TechDivision\Import\Product\Bundle\Observers\BundleOptionValueObserver">
+            <argument type="service" id="import_product_bundle.processor.product.bundle"/>
+        </service>
+        <service id="import_product_bundle.observer.bundle.option.value.update" class="TechDivision\Import\Product\Bundle\Observers\BundleOptionValueUpdateObserver">
+            <argument type="service" id="import_product_bundle.processor.product.bundle"/>
+        </service>
+        <service id="import_product_bundle.observer.bundle.selection.price" class="TechDivision\Import\Product\Bundle\Observers\BundleSelectionPriceObserver">
+            <argument type="service" id="import_product_bundle.processor.product.bundle"/>
+            <argument type="service" id="import.observer.dynamic.attribute.loader"/>
+        </service>
+        <service id="import_product_bundle.observer.bundle.selection.price.update" class="TechDivision\Import\Product\Bundle\Observers\BundleSelectionPriceUpdateObserver">
+            <argument type="service" id="import_product_bundle.processor.product.bundle"/>
+        </service>
+        <service id="import_product_bundle.observer.bundle.product.relation" class="TechDivision\Import\Product\Bundle\Observers\BundleProductRelationObserver">
+            <argument type="service" id="import_product_bundle.processor.product.bundle"/>
+        </service>
+        <service id="import_product_bundle.observer.bundle.product.relation.update" class="TechDivision\Import\Product\Bundle\Observers\BundleProductRelationUpdateObserver">
+            <argument type="service" id="import_product_bundle.processor.product.bundle"/>
+        </service>
+        <service id="import_product_bundle.observer.sku.entity.id.mapping" class="TechDivision\Import\Product\Observers\GenericSkuEntityIdMappingObserver">
+            <argument type="service" id="import_product.processor.product.bunch"/>
+            <argument type="string">%import_product_bundle.param.sku.column.name%</argument>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the replace operation.
+         |-->
+        <service id="import_product_bundle.observer.composite.replace" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_product_bundle.observer.bundle.option" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_bundle.observer.bundle.option.value" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_bundle.observer.bundle.selection" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_bundle.observer.bundle.selection.price" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_bundle.observer.bundle.product.relation" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the add-update operation.
+         |-->
+        <service id="import_product_bundle.observer.composite.add_update" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_product_bundle.observer.sku.entity.id.mapping" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_bundle.observer.bundle.option.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_bundle.observer.bundle.option.value.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_bundle.observer.bundle.selection.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_bundle.observer.bundle.selection.price.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_bundle.observer.bundle.product.relation.update" type="service"/>
+            </call>
+        </service>
+
+        <service id="import_product_bundle.subject.bundle" class="TechDivision\Import\Product\Bundle\Subjects\BundleSubject" shared="false">
+            <argument type="service" id="import.processor.registry"/>
+            <argument type="service" id="import.generator.core.config.data.uid"/>
+            <argument type="service" id="loggers"/>
+            <argument type="service" id="import.events.emitter"/>
+        </service>
+
+    </services>
+
+</container>

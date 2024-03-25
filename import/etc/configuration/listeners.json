@@ -1,0 +1,43 @@
+{
+  "listeners": [
+    {
+      "app.set.up": [
+        "import.listener.render.ansi.art",
+        "import.listener.render.operation.info",
+        "import.listener.render.mysql.info",
+        "import.listener.render.debug.info",
+        "import.listener.initialize.registry"
+      ],
+      "app.process.transaction.success": [
+        "import.listener.debug.dump.prepare",
+        "import.listener.finalize.registry",
+        "import.listener.render.nostrict.validations",
+        "import.listener.archive",
+        "import.listener.clear.artefacts",
+        "import.listener.clear.directories",
+        "import.listener.operation.report",
+        "import.listener.no.files.registry",
+        "import.listener.invalid.data.no.strict.registry"
+      ],
+      "app.process.transaction.failure": [
+        "import.listener.debug.dump.prepare",
+        "import.listener.finalize.registry",
+        "import.listener.render.validations",
+        "import.listener.render.nostrict.validations"
+      ],
+      "app.tear.down": [
+        "import.listener.import.history",
+        "import.listener.clear.registry"
+      ],
+      "action.create.success.create.url_rewrite": [
+        "import.listener.cache.url.rewrite"
+      ],
+      "action.create.success.update.url_rewrite": [
+        "import.listener.cache.url.rewrite"
+      ],
+      "action.create.success.delete.url_rewrite": [
+        "import.listener.cache.url.rewrite"
+      ]
+    }
+  ]
+}

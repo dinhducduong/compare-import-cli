@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!--
+         | The DI configuration for the entity mergers
+         |-->
+        <service id="import_attribute_set.loader.header.mapping.attribute.set" class="TechDivision\Import\Loaders\EntityTypeHeaderMappingLoader">
+            <argument type="service" id="import.loader.header.mapping"/>
+            <argument type="constant">TechDivision\Import\Attribute\Set\Utils\EntityTypeCodes::EAV_ATTRIBUTE_SET</argument>
+        </service>
+        <service id="import_attribute_set.loader.header.mapping.attribute.group" class="TechDivision\Import\Loaders\EntityTypeHeaderMappingLoader">
+            <argument type="service" id="import.loader.header.mapping"/>
+            <argument type="constant">TechDivision\Import\Attribute\Set\Utils\EntityTypeCodes::EAV_ATTRIBUTE_GROUP</argument>
+        </service>
+        <service id="import_attribute_set.entity.merger.empty.columns.attribute.set" class="TechDivision\Import\Observers\EntityMergers\CleanUpColumnsEntityMerger">
+            <argument type="service" id="import_attribute_set.loader.header.mapping.attribute.set"/>
+        </service>
+        <service id="import_attribute_set.entity.merger.empty.columns.attribute.group" class="TechDivision\Import\Observers\EntityMergers\CleanUpColumnsEntityMerger">
+            <argument type="service" id="import_attribute_set.loader.header.mapping.attribute.group"/>
+        </service>
+        <service id="import_attribute_set.entity.merger.composite.attribute.set" class="TechDivision\Import\Observers\EntityMergers\GenericCompositeEntityMerger">
+            <call method="append">
+                <argument type="service" id="import_attribute_set.entity.merger.empty.columns.attribute.set"/>
+            </call>
+        </service>
+        <service id="import_attribute_set.entity.merger.composite.attribute.group" class="TechDivision\Import\Observers\EntityMergers\GenericCompositeEntityMerger">
+            <call method="append">
+                <argument type="service" id="import_attribute_set.entity.merger.empty.columns.attribute.group"/>
+            </call>
+        </service>
+
+        <service id="import_attribute_set.repository.sql.statement" class="TechDivision\Import\Attribute\Set\Repositories\SqlStatementRepository">
+            <argument type="service" id="import.util.sql.compilers"/>
+        </service>
+        <service id="import_attribute_set.repository.entity.attribute" class="TechDivision\Import\Attribute\Set\Repositories\EntityAttributeRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute_set.repository.sql.statement"/>
+        </service>
+        <service id="import_attribute_set.repository.eav.attribute.group" class="TechDivision\Import\Attribute\Set\Repositories\EavAttributeGroupRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute_set.repository.sql.statement"/>
+        </service>
+
+        <service id="import_attribute_set.action.processor.eav.attribute.set.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute_set.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Set\Utils\SqlStatementKeys::CREATE_ATTRIBUTE_SET</argument>
+            </argument>
+        </service>
+        <service id="import_attribute_set.action.processor.eav.attribute.set.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute_set.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Set\Utils\SqlStatementKeys::UPDATE_ATTRIBUTE_SET</argument>
+            </argument>
+        </service>
+        <service id="import_attribute_set.action.processor.eav.attribute.set.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute_set.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Set\Utils\SqlStatementKeys::DELETE_ATTRIBUTE_SET</argument>
+            </argument>
+        </service>
+        <service id="import_attribute_set.action.processor.eav.attribute.group.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute_set.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Set\Utils\SqlStatementKeys::CREATE_ATTRIBUTE_GROUP</argument>
+            </argument>
+        </service>
+        <service id="import_attribute_set.action.processor.eav.attribute.group.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute_set.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Set\Utils\SqlStatementKeys::UPDATE_ATTRIBUTE_GROUP</argument>
+            </argument>
+        </service>
+        <service id="import_attribute_set.action.processor.eav.attribute.group.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute_set.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Set\Utils\SqlStatementKeys::DELETE_ATTRIBUTE_GROUP</argument>
+            </argument>
+        </service>
+
+        <service id="import_attribute_set.action.eav.attribute.set" class="TechDivision\Import\Dbal\Collection\Actions\GenericIdentifierAction">
+            <argument type="service" id="import_attribute_set.action.processor.eav.attribute.set.create"/>
+            <argument type="service" id="import_attribute_set.action.processor.eav.attribute.set.update"/>
+            <argument type="service" id="import_attribute_set.action.processor.eav.attribute.set.delete"/>
+            <argument type="constant">TechDivision\Import\Attribute\Set\Utils\MemberNames::ATTRIBUTE_SET_ID</argument>
+        </service>
+        <service id="import_attribute_set.action.eav.attribute.group" class="TechDivision\Import\Dbal\Collection\Actions\GenericIdentifierAction">
+            <argument type="service" id="import_attribute_set.action.processor.eav.attribute.group.create"/>
+            <argument type="service" id="import_attribute_set.action.processor.eav.attribute.group.update"/>
+            <argument type="service" id="import_attribute_set.action.processor.eav.attribute.group.delete"/>
+            <argument type="constant">TechDivision\Import\Attribute\Set\Utils\MemberNames::ATTRIBUTE_GROUP_ID</argument>
+        </service>
+
+        <service id="import_attribute_set.observer.clear.attribute.set" class="TechDivision\Import\Attribute\Set\Observers\ClearAttributeSetObserver">
+            <argument type="service" id="import_attribute_set.processor.attribute.set.bunch"/>
+        </service>
+        <service id="import_attribute_set.observer.attribute.set.clean.up" class="TechDivision\Import\Attribute\Set\Observers\AttributeSetCleanUpObserver">
+            <argument type="service" id="import_attribute_set.processor.attribute.set.bunch"/>
+        </service>
+        <service id="import_attribute_set.observer.attribute.set" class="TechDivision\Import\Attribute\Set\Observers\AttributeSetObserver">
+            <argument type="service" id="import_attribute_set.processor.attribute.set.bunch"/>
+            <argument type="service" id="import.observer.dynamic.attribute.loader"/>
+            <argument type="service" id="import_attribute_set.entity.merger.composite.attribute.set"/>
+        </service>
+        <service id="import_attribute_set.observer.attribute.set.update" class="TechDivision\Import\Attribute\Set\Observers\AttributeSetUpdateObserver">
+            <argument type="service" id="import_attribute_set.processor.attribute.set.bunch"/>
+            <argument type="service" id="import.observer.dynamic.attribute.loader"/>
+            <argument type="service" id="import_attribute_set.entity.merger.composite.attribute.set"/>
+        </service>
+        <service id="import_attribute_set.observer.attribute.group" class="TechDivision\Import\Attribute\Set\Observers\AttributeGroupObserver">
+            <argument type="service" id="import_attribute_set.processor.attribute.set.bunch"/>
+            <argument type="service" id="import.observer.dynamic.attribute.loader"/>
+            <argument type="service" id="import_attribute_set.entity.merger.composite.attribute.group"/>
+        </service>
+        <service id="import_attribute_set.observer.attribute.group.update" class="TechDivision\Import\Attribute\Set\Observers\AttributeGroupUpdateObserver">
+            <argument type="service" id="import_attribute_set.processor.attribute.set.bunch"/>
+            <argument type="service" id="import.observer.dynamic.attribute.loader"/>
+            <argument type="service" id="import_attribute_set.entity.merger.composite.attribute.group"/>
+        </service>
+        <service id="import_attribute_set.observer.copy.parent.attribute.set" class="TechDivision\Import\Attribute\Set\Observers\CopyParentAttributeSetObserver">
+            <argument type="service" id="import_attribute_set.processor.attribute.set.bunch"/>
+        </service>
+        <service id="import_attribute_set.observer.copy.parent.attribute.set.update" class="TechDivision\Import\Attribute\Set\Observers\CopyParentAttributeSetUpdateObserver">
+            <argument type="service" id="import_attribute_set.processor.attribute.set.bunch"/>
+        </service>
+
+        <!--
+         | The DI configuration for the callbacks.
+         |-->
+        <service id="import_attribute_set.callback.attribute.set.name.validator" class="TechDivision\Import\Attribute\Set\Callbacks\AttributeSetNameValidatorCallback">
+            <argument type="service" id="import.loader.attribute.set.name"/>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the attribute set replace operation.
+         |-->
+        <service id="import_attribute_set.observer.composite.replace" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_attribute_set.observer.clear.attribute.set" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute_set.observer.attribute.set" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute_set.observer.attribute.group" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute_set.observer.copy.parent.attribute.set" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute_set.observer.attribute.set.clean.up" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the attribute set add-update operation.
+         |-->
+        <service id="import_attribute_set.observer.composite.add_update" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_attribute_set.observer.attribute.set.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute_set.observer.attribute.group.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute_set.observer.copy.parent.attribute.set.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute_set.observer.attribute.set.clean.up" type="service"/>
+            </call>
+        </service>
+
+        <service id="import_attribute_set.loader.raw.entity" class="TechDivision\Import\Attribute\Set\Loaders\RawEntityLoader">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import.loader.column.metadata"/>
+            <argument type="service" id="import.loader.raw.entity"/>
+        </service>
+
+        <service id="import_attribute_set.processor.attribute.set.bunch" class="TechDivision\Import\Attribute\Set\Services\AttributeSetBunchProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import.repository.eav.attribute.set"/>
+            <argument type="service" id="import_attribute_set.repository.eav.attribute.group"/>
+            <argument type="service" id="import_attribute_set.repository.entity.attribute"/>
+            <argument type="service" id="import_attribute_set.action.eav.attribute.set"/>
+            <argument type="service" id="import_attribute_set.action.eav.attribute.group"/>
+            <argument type="service" id="import_attribute.action.entity.attribute"/>
+            <argument type="service" id="import_attribute_set.loader.raw.entity"/>
+        </service>
+
+        <service id="import_attribute_set.subject.bunch" class="TechDivision\Import\Attribute\Set\Subjects\BunchSubject" shared="false">
+            <argument type="service" id="import.processor.registry"/>
+            <argument type="service" id="import.generator.core.config.data.uid"/>
+            <argument type="service" id="loggers"/>
+            <argument type="service" id="import.events.emitter"/>
+        </service>
+
+    </services>
+
+</container>

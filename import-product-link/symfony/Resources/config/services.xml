@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="import_product_link.param.sku.column.name" type="constant">TechDivision\Import\Product\Link\Utils\ColumnKeys::LINK_CHILD_SKU</parameter>
+    </parameters>
+
+    <services>
+
+        <service id="import_product_link.repository.sql.statement" class="TechDivision\Import\Product\Link\Repositories\SqlStatementRepository">
+            <argument type="service" id="import.util.sql.compilers"/>
+        </service>
+        <service id="import_product_link.repository.product.link" class="TechDivision\Import\Product\Link\Repositories\ProductLinkRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+        </service>
+        <service id="import_product_link.repository.product.link.attribute.int" class="TechDivision\Import\Product\Link\Repositories\ProductLinkAttributeIntRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+        </service>
+        <service id="import_product_link.repository.product.link.attribute.decimal" class="TechDivision\Import\Product\Link\Repositories\ProductLinkAttributeDecimalRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+        </service>
+        <service id="import_product_link.repository.product.link.attribute.varchar" class="TechDivision\Import\Product\Link\Repositories\ProductLinkAttributeVarcharRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+        </service>
+
+        <!--
+         | The DI action processor configuration
+         |-->
+        <service id="import_product_link.action.processor.product.link.delete" class="TechDivision\Import\Product\Link\Actions\Processors\ProductLinkDeleteProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+        </service>
+        <service id="import_product_link.action.processor.product.link.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Link\Utils\SqlStatementKeys::CREATE_PRODUCT_LINK</argument>
+            </argument>
+        </service>
+        <service id="import_product_link.action.processor.product.link.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Link\Utils\SqlStatementKeys::UPDATE_PRODUCT_LINK</argument>
+            </argument>
+        </service>
+        <service id="import_product_link.action.processor.product.link.attribute.int.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Link\Utils\SqlStatementKeys::CREATE_PRODUCT_LINK_ATTRIBUTE_INT</argument>
+            </argument>
+        </service>
+        <service id="import_product_link.action.processor.product.link.attribute.int.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Link\Utils\SqlStatementKeys::UPDATE_PRODUCT_LINK_ATTRIBUTE_INT</argument>
+            </argument>
+        </service>
+        <service id="import_product_link.action.processor.product.link.attribute.decimal.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Link\Utils\SqlStatementKeys::CREATE_PRODUCT_LINK_ATTRIBUTE_DECIMAL</argument>
+            </argument>
+        </service>
+        <service id="import_product_link.action.processor.product.link.attribute.decimal.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Link\Utils\SqlStatementKeys::UPDATE_PRODUCT_LINK_ATTRIBUTE_DECIMAL</argument>
+            </argument>
+        </service>
+        <service id="import_product_link.action.processor.product.link.attribute.varchar.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Link\Utils\SqlStatementKeys::CREATE_PRODUCT_LINK_ATTRIBUTE_VARCHAR</argument>
+            </argument>
+        </service>
+        <service id="import_product_link.action.processor.product.link.attribute.varchar.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Product\Link\Utils\SqlStatementKeys::UPDATE_PRODUCT_LINK_ATTRIBUTE_VARCHAR</argument>
+            </argument>
+        </service>
+
+        <service id="import_product_link.action.product.link" class="TechDivision\Import\Dbal\Collection\Actions\GenericIdentifierAction">
+            <argument type="service" id="import_product_link.action.processor.product.link.create"/>
+            <argument type="service" id="import_product_link.action.processor.product.link.update"/>
+            <argument type="service" id="import_product_link.action.processor.product.link.delete"/>
+            <argument type="constant">TechDivision\Import\Product\Link\Utils\MemberNames::LINK_ID</argument>
+        </service>
+        <service id="import_product_link.action.product.link.attribute.int" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_product_link.action.processor.product.link.attribute.int.create"/>
+            <argument type="service" id="import_product_link.action.processor.product.link.attribute.int.update"/>
+        </service>
+        <service id="import_product_link.action.product.link.attribute.decimal" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_product_link.action.processor.product.link.attribute.decimal.create"/>
+            <argument type="service" id="import_product_link.action.processor.product.link.attribute.decimal.update"/>
+        </service>
+        <service id="import_product_link.action.product.link.attribute.varchar" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_product_link.action.processor.product.link.attribute.varchar.create"/>
+            <argument type="service" id="import_product_link.action.processor.product.link.attribute.varchar.update"/>
+        </service>
+
+        <service id="import_product_link.processor.product.link" class="TechDivision\Import\Product\Link\Services\ProductLinkProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_product_link.repository.product.link"/>
+            <argument type="service" id="import_product_link.repository.product.link.attribute.int"/>
+            <argument type="service" id="import_product_link.repository.product.link.attribute.decimal"/>
+            <argument type="service" id="import_product_link.repository.product.link.attribute.varchar"/>
+            <argument type="service" id="import_product_link.action.product.link"/>
+            <argument type="service" id="import_product_link.action.product.link.attribute.int"/>
+            <argument type="service" id="import_product_link.action.product.link.attribute.decimal"/>
+            <argument type="service" id="import_product_link.action.product.link.attribute.varchar"/>
+        </service>
+
+        <service id="import_product_link.observer.product.link" class="TechDivision\Import\Product\Link\Observers\ProductLinkObserver"/>
+        <service id="import_product_link.observer.link.attribute.position" class="TechDivision\Import\Product\Link\Observers\LinkAttributePositionObserver">
+            <argument type="service" id="import_product_link.processor.product.link"/>
+        </service>
+        <service id="import_product_link.observer.link.attribute.position.update" class="TechDivision\Import\Product\Link\Observers\LinkAttributePositionUpdateObserver">
+            <argument type="service" id="import_product_link.processor.product.link"/>
+        </service>
+        <service id="import_product_link.observer.link" class="TechDivision\Import\Product\Link\Observers\LinkObserver">
+            <argument type="service" id="import_product_link.processor.product.link"/>
+        </service>
+        <service id="import_product_link.observer.sku.entity.id.mapping" class="TechDivision\Import\Product\Observers\GenericSkuEntityIdMappingObserver">
+            <argument type="service" id="import_product.processor.product.bunch"/>
+            <argument type="string">%import_product_link.param.sku.column.name%</argument>
+        </service>
+        <service id="import_product_link.observer.clean.up.product.link" class="TechDivision\Import\Product\Link\Observers\CleanUpLinkObserver">
+            <argument type="service" id="import_product_link.processor.product.link"/>
+        </service>
+        <!--
+         | The DI configuration for the composite observers of the replace operation.
+         |-->
+        <service id="import_product_link.observer.composite.replace" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_product_link.observer.sku.entity.id.mapping" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_link.observer.link" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_link.observer.link.attribute.position" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the add-update operation.
+         |-->
+        <service id="import_product_link.observer.composite.add_update" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_product_link.observer.sku.entity.id.mapping" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_link.observer.link" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_product_link.observer.link.attribute.position.update" type="service"/>
+            </call>
+        </service>
+
+        <service id="import_product_link.subject.link" class="TechDivision\Import\Product\Link\Subjects\LinkSubject" shared="false">
+            <argument type="service" id="import.processor.registry"/>
+            <argument type="service" id="import.generator.core.config.data.uid"/>
+            <argument type="service" id="loggers"/>
+            <argument type="service" id="import.events.emitter"/>
+        </service>
+
+    </services>
+
+</container>

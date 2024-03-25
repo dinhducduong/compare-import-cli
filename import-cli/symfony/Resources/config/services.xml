@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+
+        <parameter key="application.name">Pacemaker - Community Console Tool</parameter>
+        <parameter key="application.version.file">.semver</parameter>
+        <parameter key="application.default.configuration.dir">etc</parameter>
+        <parameter key="application.custom.configuration.dir">app/etc</parameter>
+        <parameter key="application.edition.mappings" type="collection">
+            <parameter key="magento/product-community-edition" type="constant">TechDivision\Import\Utils\EditionNamesInterface::CE</parameter>
+            <parameter key="magento/product-enterprise-edition" type="constant">TechDivision\Import\Utils\EditionNamesInterface::EE</parameter>
+        </parameter>
+        <parameter key="application.default.libraries" type="collection">
+            <parameter key="ce" type="collection">
+                <parameter>techdivision/import-app-simple</parameter>
+                <parameter>techdivision/import</parameter>
+                <parameter>techdivision/import-cli</parameter>
+                <parameter>techdivision/import-attribute</parameter>
+                <parameter>techdivision/import-attribute-set</parameter>
+                <parameter>techdivision/import-category</parameter>
+                <parameter>techdivision/import-customer</parameter>
+                <parameter>techdivision/import-customer-address</parameter>
+                <parameter>techdivision/import-product</parameter>
+                <parameter>techdivision/import-product-msi</parameter>
+                <parameter>techdivision/import-product-tier-price</parameter>
+                <parameter>techdivision/import-product-url-rewrite</parameter>
+                <parameter>techdivision/import-product-bundle</parameter>
+                <parameter>techdivision/import-product-link</parameter>
+                <parameter>techdivision/import-product-media</parameter>
+                <parameter>techdivision/import-product-variant</parameter>
+                <parameter>techdivision/import-product-grouped</parameter>
+                <parameter>techdivision/import-converter</parameter>
+                <parameter>techdivision/import-converter-product-category</parameter>
+                <parameter>techdivision/import-converter-product-attribute</parameter>
+                <parameter>techdivision/import-converter-customer-attribute</parameter>
+            </parameter>
+            <parameter key="ee" type="collection">
+                <parameter>techdivision/import-app-simple</parameter>
+                <parameter>techdivision/import</parameter>
+                <parameter>techdivision/import-cli</parameter>
+                <parameter>techdivision/import-ee</parameter>
+                <parameter>techdivision/import-attribute</parameter>
+                <parameter>techdivision/import-attribute-set</parameter>
+                <parameter>techdivision/import-category</parameter>
+                <parameter>techdivision/import-category-ee</parameter>
+                <parameter>techdivision/import-customer</parameter>
+                <parameter>techdivision/import-customer-address</parameter>
+                <parameter>techdivision/import-product</parameter>
+                <parameter>techdivision/import-product-ee</parameter>
+                <parameter>techdivision/import-product-msi</parameter>
+                <parameter>techdivision/import-product-tier-price</parameter>
+                <parameter>techdivision/import-product-url-rewrite</parameter>
+                <parameter>techdivision/import-product-bundle</parameter>
+                <parameter>techdivision/import-product-bundle-ee</parameter>
+                <parameter>techdivision/import-product-link</parameter>
+                <parameter>techdivision/import-product-link-ee</parameter>
+                <parameter>techdivision/import-product-media</parameter>
+                <parameter>techdivision/import-product-media-ee</parameter>
+                <parameter>techdivision/import-product-variant</parameter>
+                <parameter>techdivision/import-product-variant-ee</parameter>
+                <parameter>techdivision/import-product-grouped</parameter>
+                <parameter>techdivision/import-product-grouped-ee</parameter>
+                <parameter>techdivision/import-converter</parameter>
+                <parameter>techdivision/import-converter-ee</parameter>
+                <parameter>techdivision/import-converter-product-category</parameter>
+                <parameter>techdivision/import-converter-product-attribute</parameter>
+                <parameter>techdivision/import-converter-customer-attribute</parameter>
+            </parameter>
+        </parameter>
+        <parameter key="application.default.configuration.parser.mappings" type="collection">
+            <parameter key="json">import_cli.configuration.parser.json.extended</parameter>
+        </parameter>
+        <parameter key="application.cli.options.override.if.empty.only" type="collection">
+            <parameter type="constant">TechDivision\Import\Cli\Command\InputOptionKeys::SYSTEM_NAME</parameter>
+            <parameter type="constant">TechDivision\Import\Cli\Command\InputOptionKeys::PID_FILENAME</parameter>
+            <parameter type="constant">TechDivision\Import\Cli\Command\InputOptionKeys::INSTALLATION_DIR</parameter>
+            <parameter type="constant">TechDivision\Import\Cli\Command\InputOptionKeys::MAGENTO_EDITION</parameter>
+            <parameter type="constant">TechDivision\Import\Cli\Command\InputOptionKeys::MAGENTO_VERSION</parameter>
+            <parameter type="constant">TechDivision\Import\Cli\Command\InputOptionKeys::SOURCE_DIR</parameter>
+            <parameter type="constant">TechDivision\Import\Cli\Command\InputOptionKeys::TARGET_DIR</parameter>
+        </parameter>
+        
+    </parameters>
+
+    <services>
+
+        <service id="service_container" synthetic="true" />
+
+        <service id="input" class="TechDivision\Import\Cli\Console\ArgvInput"/>
+        <service id="output" class="Symfony\Component\Console\Output\ConsoleOutput"/>
+
+        <service id="import_cli.utils.command.names" class="TechDivision\Import\Utils\CommandNames"/>
+        <service id="import_cli.utils.mappings.command.name.to.entity.type.code" class="TechDivision\Import\Utils\Mappings\CommandNameToEntityTypeCode"/>
+
+        <service id="import_cli.input.option.keys" class="TechDivision\Import\Cli\Command\InputOptionKeys"/>
+        <service id="import_cli.utils.array" class="TechDivision\Import\Configuration\Jms\Utils\ArrayUtil"/>
+
+        <service id="import_cli.loader.vendor.dir" class="TechDivision\Import\Cli\Loaders\ContainerParameterLoader">
+            <argument type="service" id="service_container"/>
+            <argument type="constant">TechDivision\Import\Cli\Utils\DependencyInjectionKeys::CONFIGURATION_VENDOR_DIR</argument>
+        </service>
+        <service id="import_cli.configuration.parser.json" class="TechDivision\Import\Configuration\Jms\Parsers\JsonParser">
+            <argument type="service" id="import_cli.utils.array"/>
+        </service>
+        <service id="import_cli.configuration.parser.json.extended" class="TechDivision\Import\Configuration\Jms\Parsers\ExtendedJsonParser">
+            <argument type="service" id="import_cli.utils.array"/>
+            <argument type="service" id="import_cli.loader.vendor.dir"/>
+        </service>
+        <service id="import_cli.configuration.parser.factory" class="TechDivision\Import\Configuration\Jms\ConfigurationParserFactory">
+            <argument type="service" id="service_container"/>
+            <argument>%application.default.configuration.parser.mappings%</argument>
+        </service>
+        <service id="import_cli.configuration.expression.language" class="Symfony\Component\DependencyInjection\ExpressionLanguage"/>
+        <service id="import_cli.configuration.expression.evaluator" class="JMS\Serializer\Expression\ExpressionEvaluator">
+            <argument type="service" id="import_cli.configuration.expression.language"/>
+        </service>
+        <service id="import_cli.configuration.serializer.builder" class="JMS\Serializer\SerializerBuilder">
+            <factory class="JMS\Serializer\SerializerBuilder" method="create"/>
+            <call method="setExpressionEvaluator">
+                <argument id="import_cli.configuration.expression.evaluator" type="service"/>
+            </call>
+        </service>
+        <service id="import_cli.configuration.factory" class="TechDivision\Import\Configuration\Jms\ConfigurationFactory">
+            <argument type="service" id="service_container"/>
+            <argument type="service" id="import_cli.configuration.parser.factory"/>
+            <argument type="service" id="import_cli.configuration.serializer.builder"/>
+        </service>
+        <service id="import_cli.configuration.console.option.loader" class="TechDivision\Import\Configuration\Jms\ConsoleOptionLoader">
+            <argument type="service" id="input"/>
+            <argument type="service" id="import_cli.input.option.keys"/>
+            <argument>%application.cli.options.override.if.empty.only%</argument>
+        </service>
+
+        <service id="import_cli.command.import.debug" class="TechDivision\Import\Cli\Command\ImportDebugCommand"/>
+        <service id="import_cli.command.import.execute" class="TechDivision\Import\Cli\Command\ImportExecuteCommand"/>
+        <service id="import_cli.command.import.products" class="TechDivision\Import\Cli\Command\ImportProductsCommand"/>
+        <service id="import_cli.command.import.products.price" class="TechDivision\Import\Cli\Command\ImportProductsPriceCommand"/>
+        <service id="import_cli.command.import.products.inventory" class="TechDivision\Import\Cli\Command\ImportProductsInventoryCommand"/>
+        <service id="import_cli.command.import.categories" class="TechDivision\Import\Cli\Command\ImportCategoriesCommand"/>
+        <service id="import_cli.command.import.customers" class="TechDivision\Import\Cli\Command\ImportCustomersCommand"/>
+        <service id="import_cli.command.import.customers.address" class="TechDivision\Import\Cli\Command\ImportCustomersAddressCommand"/>
+        <service id="import_cli.command.import.attributes" class="TechDivision\Import\Cli\Command\ImportAttributesCommand"/>
+        <service id="import_cli.command.import.attributes.set" class="TechDivision\Import\Cli\Command\ImportAttributesSetCommand"/>
+        <service id="import_cli.command.import.clear.pid.file" class="TechDivision\Import\Cli\Command\ImportClearPidFileCommand"/>
+        <service id="import_cli.command.import.create.ok.file" class="TechDivision\Import\Cli\Command\ImportCreateOkFileCommand"/>
+        <service id="import_cli.command.import.create.configuration.file" class="TechDivision\Import\Cli\Command\ImportCreateConfigurationFileCommand"/>
+        <service id="import_cli.command.import.products.tier.price" class="TechDivision\Import\Cli\Command\ImportProductsTierPriceCommand"/>
+        <service id="import_cli.command.import.products.inventory.msi" class="TechDivision\Import\Cli\Command\ImportProductsInventoryMsiCommand"/>
+        <service id="import_cli.command.import.convert.value" class="TechDivision\Import\Cli\Command\ImportConvertValueCommand"/>
+        <service id="import_cli.command.import.products.url" class="TechDivision\Import\Cli\Command\ImportProductsUrlCommand"/>
+
+        <service id="application" class="TechDivision\Import\Cli\Application">
+            <argument type="service" id="service_container"/>
+            <call method="add">
+                <argument id="import_cli.command.import.debug" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.products" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.products.price" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.products.inventory" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.categories" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.customers" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.customers.address" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.attributes" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.attributes.set" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.clear.pid.file" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.create.ok.file" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.create.configuration.file" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.products.tier.price" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.products.inventory.msi" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.execute" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.convert.value" type="service"/>
+            </call>
+            <call method="add">
+                <argument id="import_cli.command.import.products.url" type="service"/>
+            </call>
+        </service>
+
+        <!-- 
+         ! The DI configuration for the execution context
+         !-->
+        <service id="import_cli.configuration.manager" class="TechDivision\Import\Execution\ConfigurationManager">
+            <argument type="service" id="configuration"/>
+        </service>
+        <service id="import.configuration.manager" alias="import_cli.configuration.manager"/>
+
+        <service id="import_cli.library.loader" class="TechDivision\Import\Cli\Configuration\LibraryLoader">
+            <argument type="service" id="service_container"/>
+        </service>
+
+        <service id="import_cli.configuration.simple.loader" class="TechDivision\Import\Cli\SimpleConfigurationLoader">
+            <argument type="service" id="input"/>
+            <argument type="service" id="service_container"/>
+            <argument type="service" id="import_cli.library.loader"/>
+            <argument type="service" id="import_cli.configuration.factory"/>
+            <argument type="service" id="import_cli.utils.command.names"/>
+            <argument type="service" id="import_cli.utils.mappings.command.name.to.entity.type.code"/>
+            <argument type="service" id="import_cli.configuration.console.option.loader"/>
+        </service>
+
+        <service id="import_cli.configuration.loader" class="TechDivision\Import\Cli\ConfigurationLoader">
+            <argument type="service" id="input"/>
+            <argument type="service" id="service_container"/>
+            <argument type="service" id="import_cli.library.loader"/>
+            <argument type="service" id="import_cli.configuration.factory"/>
+            <argument type="service" id="import_cli.utils.command.names"/>
+            <argument type="service" id="import_cli.utils.mappings.command.name.to.entity.type.code"/>
+            <argument type="service" id="import_cli.configuration.console.option.loader"/>
+        </service>
+
+        <service id="import_cli.application.loader" class="TechDivision\Import\Cli\ApplicationLoader">
+            <argument type="service" id="service_container"/>
+        </service>
+
+        <service id="import_cli.factory.logger" class="TechDivision\Import\Loggers\LoggerFactory">
+            <argument type="service" id="service_container"/>
+            <argument type="service" id="configuration"/>
+        </service>
+
+        <service id="loggers" class="array">
+            <factory service="import_cli.factory.logger" method="createLoggers"/>
+        </service>
+
+        <service id="configuration" class="TechDivision\Import\Cli\Configuration">
+            <factory service="import_cli.configuration.loader" method="load"/>
+        </service>
+
+        <service id="configuration.simple" class="TechDivision\Import\Cli\Configuration">
+            <factory service="import_cli.configuration.simple.loader" method="load"/>
+        </service>
+
+        <service id="connection" class="TechDivision\Import\Dbal\Collection\Connection\PDOConnectionWrapper">
+            <factory class="TechDivision\Import\Dbal\Collection\Connection\ConnectionFactory" method="createConnection"/>
+            <argument type="service" id="configuration"/>
+        </service>
+
+        <!--
+         | ATTENTION: Override the DI of the default configuration renderer with a JMS serializer one
+         |-->
+        <service id="import.renderer.debug.file.configuration" class="TechDivision\Import\Configuration\Jms\Listeners\Renderer\Debug\ConfigurationFileRenderer">
+            <argument type="service" id="import.processor.registry"/>
+            <argument type="service" id="configuration"/>
+            <argument type="service" id="loggers"/>
+        </service>
+
+        <service id="import_cli.plugin.debug.create" class="TechDivision\Import\Cli\Plugins\DebugCreatePlugin">
+            <argument type="service" id="import_app_simple.simple"/>
+            <argument type="service" id="import.utils.debug"/>
+        </service>
+        <service id="import_cli.plugin.debug.send" class="TechDivision\Import\Cli\Plugins\DebugSendPlugin">
+            <argument type="service" id="import_app_simple.simple"/>
+        </service>
+
+    </services>
+
+</container>

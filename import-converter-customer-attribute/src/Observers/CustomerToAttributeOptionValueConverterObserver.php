@@ -1,0 +1,305 @@
+<?php
+
+/**
+ * TechDivision\Import\Converter\Customer\Attribute\Observers\CustomerToAttributeOptionValueConverterObserver
+ *
+ * PHP version 7
+ *
+ * @author    Tim Wagner <t.wagner@techdivision.com>
+ * @copyright 2019 TechDivision GmbH <info@techdivision.com>
+ * @license   https://opensource.org/licenses/MIT
+ * @link      https://github.com/techdivision/import-converter-customer-attribute
+ * @link      http://www.techdivision.com
+ */
+
+namespace TechDivision\Import\Converter\Customer\Attribute\Observers;
+
+use TechDivision\Import\Utils\StoreViewCodes;
+use TechDivision\Import\Utils\FrontendInputTypes;
+use TechDivision\Import\Attribute\Utils\ColumnKeys;
+use TechDivision\Import\Attribute\Utils\MemberNames;
+use TechDivision\Import\Observers\StateDetectorInterface;
+use TechDivision\Import\Services\ImportProcessorInterface;
+use TechDivision\Import\Converter\Observers\AbstractConverterObserver;
+use TechDivision\Import\Attribute\Callbacks\SwatchTypeLoaderInterface;
+use TechDivision\Import\Attribute\Services\AttributeBunchProcessorInterface;
+use TechDivision\Import\Observers\CleanUpEmptyColumnsTrait;
+
+/**
+ * Observer that extracts the missing attribute option values from a customer CSV.
+ *
+ * @author    Tim Wagner <t.wagner@techdivision.com>
+ * @copyright 2019 TechDivision GmbH <info@techdivision.com>
+ * @license   https://opensource.org/licenses/MIT
+ * @link      https://github.com/techdivision/import-converter-customer-attribute
+ * @link      http://www.techdivision.com
+ */
+class CustomerToAttributeOptionValueConverterObserver extends AbstractConverterObserver
+{
+
+    use CleanUpEmptyColumnsTrait;
+
+    /**
+     * The artefact type.
+     *
+     * @var string
+     */
+    const ARTEFACT_TYPE = 'option-import';
+
+    /**
+     * The import processor instance.
+     *
+     * @var \TechDivision\Import\Services\ImportProcessorInterface
+     */
+    protected $importProcessor;
+
+    /**
+     * The attribute bunch processor instance.
+     *
+     * @var \TechDivision\Import\Attribute\Services\AttributeBunchProcessorInterface
+     */
+    protected $attributeBunchProcessor;
+
+    /**
+     * The swatch type loader instance.
+     *
+     * @var \TechDivision\Import\Attribute\Callbacks\SwatchTypeLoaderInterface
+     */
+    protected $swatchTypeLoader;
+
+    /**
+     * Initialize the observer with the passed customer bunch processor instance.
+     *
+     * @param \TechDivision\Import\Services\ImportProcessorInterface                   $importProcessor         The customer bunch processor instance
+     * @param \TechDivision\Import\Attribute\Services\AttributeBunchProcessorInterface $attributeBunchProcessor The attribute bunch processor instance
+     * @param \TechDivision\Import\Attribute\Callbacks\SwatchTypeLoaderInterface       $swatchTypeLoader        The swatch type loader instance
+     * @param \TechDivision\Import\Observers\StateDetectorInterface|null               $stateDetector           The state detector instance to use
+     */
+    public function __construct(
+        ImportProcessorInterface $importProcessor,
+        AttributeBunchProcessorInterface $attributeBunchProcessor,
+        SwatchTypeLoaderInterface $swatchTypeLoader,
+        StateDetectorInterface $stateDetector = null
+    ) {
+
+        // initialize the swatch type loader and the processor instances
+        $this->importProcessor = $importProcessor;
+        $this->swatchTypeLoader = $swatchTypeLoader;
+        $this->attributeBunchProcessor = $attributeBunchProcessor;
+
+        // pass the state detector to the parent method
+        parent::__construct($stateDetector);
+    }
+
+    /**
+     * Process the observer's business logic.
+     *
+     * @return void
+     */
+    protected function process()
+    {
+
+        // initialize the store view code
+        $this->prepareStoreViewCode();
+
+        // load the store ID, use the admin store if NO store view code has been set
+        $storeId = $this->getStoreId(StoreViewCodes::ADMIN);
+
+        // load the user defined EAV attributes by the found attribute set and the backend types
+        $attributes = $this->getEavUserDefinedAttributes();
+
+        // load the header keys
+        $headers = array_flip($this->getHeaders());
+
+        // remove all the empty values from the row
+        $row = $this->clearRow();
+
+        // initialize the array for the artefacts
+        $artefacts = array();
+
+        // load the entity type ID
+        $entityType = $this->loadEavEntityTypeByEntityTypeCode($this->getSubject()->getEntityTypeCode());
+        $entityTypeId = $entityType[MemberNames::ENTITY_TYPE_ID];
+
+        $emptyValueDefinition = $this->getEmptyAttributeValueConstant();
+
+        // iterate over the attributes and append them to the row
+        foreach ($row as $key => $attributeValue) {
+            // query whether or not attribute with the found code exists
+            if (!isset($attributes[$attributeCode = $headers[$key]])) {
+                // log a message in debug mode
+                if ($this->isDebugMode()) {
+                    $this->getSystemLogger()->debug(
+                        $this->appendExceptionSuffix(
+                            sprintf(
+                                'Can\'t find attribute with attribute code %s',
+                                $attributeCode
+                            )
+                        )
+                    );
+                }
+
+                // stop processing
+                continue;
+            } else {
+                // log a message in debug mode
+                if ($this->isDebugMode()) {
+                    // log a message in debug mode
+                    $this->getSystemLogger()->debug(
+                        $this->appendExceptionSuffix(
+                            sprintf(
+                                'Found attribute with attribute code %s',
+                                $attributeCode
+                            )
+                        )
+                    );
+                }
+            }
+
+            // if yes, load the attribute by its code
+            $attribute = $attributes[$attributeCode];
+
+            // we only support user defined EAV attributes of type select and multiselect
+            if (in_array($attribute[MemberNames::FRONTEND_INPUT], array(FrontendInputTypes::SELECT, FrontendInputTypes::MULTISELECT))) {
+                // explode the values if we've a multiselect
+                $valuesExploded = $this->explode($attributeValue, $this->getMultipleValueDelimiter());
+                // check if valueExploded an array to fix crash on next step "foreach"
+                $values = is_array($valuesExploded) ? $valuesExploded : [];
+                // iterate over the values
+                foreach ($values as $value) {
+                    // query whether the value corresponds to the Empty Value definition to skip
+                    if ($value === $emptyValueDefinition) {
+                        continue;
+                    }
+                    // query whether or not the attribute value already exists
+                    if ($this->loadAttributeOptionValueByEntityTypeIdAndAttributeCodeAndStoreIdAndValue($entityTypeId, $attributeCode, $storeId, $value)) {
+                        continue;
+                    }
+
+                    // try to load the swatch type, if available
+                    $swatchType = $this->getSwatchTypeLoader()->loadSwatchType($entityTypeId, $attributeCode);
+
+                    // add the artefact to the array
+                    $artefacts[] = $this->newArtefact(
+                        array(
+                            ColumnKeys::DEFAULT_VALUE  => $attribute[MemberNames::DEFAULT_VALUE],
+                            ColumnKeys::ATTRIBUTE_CODE => $attribute[MemberNames::ATTRIBUTE_CODE],
+                            ColumnKeys::SORT_ORDER     => 0,
+                            ColumnKeys::VALUE          => is_null($swatchType) ? $value : null,
+                            ColumnKeys::SWATCH_TYPE    => $swatchType,
+                            ColumnKeys::SWATCH_VALUE   => $swatchType ? $value : null
+                        ),
+                        array()
+                    );
+                }
+            }
+        }
+
+        // export the array with artefacts
+        $this->addArtefacts($artefacts);
+    }
+
+    /**
+     * Returns the value(s) of the primary key column(s). As the primary key column can
+     * also consist of two columns, the return value can be an array also.
+     *
+     * @return mixed The primary key value(s)
+     */
+    protected function getPrimaryKeyValue()
+    {
+        return $this->getValue(\TechDivision\Import\Customer\Utils\ColumnKeys::EMAIL);
+    }
+
+    /**
+     * Return's the import processor instance.
+     *
+     * @return \TechDivision\Import\Services\ImportProcessorInterface The import processor instance
+     */
+    protected function getImportProcessor()
+    {
+        return $this->importProcessor;
+    }
+
+    /**
+     * Return's the attribute bunch processor instance.
+     *
+     * @return \TechDivision\Import\Attribute\Services\AttributeBunchProcessorInterface The attribute bunch processor instance
+     */
+    protected function getAttributeBunchProcessor()
+    {
+        return $this->attributeBunchProcessor;
+    }
+
+    /**
+     * Return's the swatch type loader instance.
+     *
+     * @return \TechDivision\Import\Attribute\Callbacks\SwatchTypeLoaderInterface The swatch type loader instance
+     */
+    protected function getSwatchTypeLoader()
+    {
+        return $this->swatchTypeLoader;
+    }
+
+    /**
+     * Return's an array with the available user defined EAV attributes for the actual entity type.
+     *
+     * @return array The array with the user defined EAV attributes
+     */
+    protected function getEavUserDefinedAttributes()
+    {
+        return $this->getSubject()->getEavUserDefinedAttributes();
+    }
+
+    /**
+     * Return's an EAV entity type with the passed entity type code.
+     *
+     * @param string $entityTypeCode The code of the entity type to return
+     *
+     * @return array The entity type with the passed entity type code
+     */
+    protected function loadEavEntityTypeByEntityTypeCode($entityTypeCode)
+    {
+        return $this->getImportProcessor()->getEavEntityTypeByEntityTypeCode($entityTypeCode);
+    }
+
+    /**
+     * Load's and return's the EAV attribute option value with the passed entity type ID, code, store ID and value.
+     *
+     * @param string  $entityTypeId  The entity type ID of the EAV attribute to load the option value for
+     * @param string  $attributeCode The code of the EAV attribute option to load
+     * @param integer $storeId       The store ID of the attribute option to load
+     * @param string  $value         The value of the attribute option to load
+     *
+     * @return array The EAV attribute option value
+     */
+    protected function loadAttributeOptionValueByEntityTypeIdAndAttributeCodeAndStoreIdAndValue($entityTypeId, $attributeCode, $storeId, $value)
+    {
+        return $this->getAttributeBunchProcessor()->loadAttributeOptionValueByEntityTypeIdAndAttributeCodeAndStoreIdAndValue($entityTypeId, $attributeCode, $storeId, $value);
+    }
+
+    /**
+     * Create's and return's a new empty artefact entity.
+     *
+     * @param array $columns             The array with the column data
+     * @param array $originalColumnNames The array with a mapping from the old to the new column names
+     *
+     * @return array The new artefact entity
+     */
+    protected function newArtefact(array $columns, array $originalColumnNames)
+    {
+        return $this->getSubject()->newArtefact($columns, $originalColumnNames);
+    }
+
+    /**
+     * Add the passed customer type artefacts to the customer with the
+     * last entity ID.
+     *
+     * @param array $artefacts The customer type artefacts
+     *
+     * @return void
+     */
+    protected function addArtefacts(array $artefacts)
+    {
+        $this->getSubject()->addArtefacts(CustomerToAttributeOptionValueConverterObserver::ARTEFACT_TYPE, $artefacts);
+    }
+}

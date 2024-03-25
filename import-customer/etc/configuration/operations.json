@@ -1,0 +1,251 @@
+{
+  "operations": {
+    "general": {
+      "customer": {
+        "validate": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "listeners": [
+                {
+                  "plugin.process.success": [
+                    "import.listener.stop.validation"
+                  ]
+                }
+              ],
+              "subjects": [
+                {
+                  "id": "import.subject.validator",
+                  "create-imported-file": false,
+                  "file-resolver": {
+                    "prefix": "customer-import"
+                  },
+                  "listeners": [
+                    {
+                      "subject.artefact.header.row.process.start": [
+                        "import.listener.validate.header.row"
+                      ]
+                    }
+                  ],
+                  "params" : {
+                    "custom-validations" : {
+                      "email" :  [ "/^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$/" ]
+                    }
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_customer.observer.composite.base.validate"
+                      ]
+                    }
+                  ],
+                  "callbacks": [
+                    {
+                      "email": [ "import.callback.custom.regex.validator" ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "delete": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_customer.subject.bunch",
+                  "file-resolver": {
+                    "prefix": "customer-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_customer.observer.clear.customer"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "replace": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_customer.subject.bunch",
+                  "file-resolver": {
+                    "prefix": "customer-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_customer.observer.composite.replace"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "replace.address": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_customer_address.subject.bunch",
+                  "file-resolver": {
+                    "prefix": "customer-import-address"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_customer.observer.composite.address.replace"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "add-update": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_customer.subject.bunch",
+                  "file-resolver": {
+                    "prefix": "customer-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_customer.observer.composite.add_update"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "convert": {
+          "plugins": {
+            "converter": {
+              "id": "import_converter.plugin.exportable.converter.generic",
+              "params": {
+                "exportable-artefact-types": [
+                  "option-import"
+                ]
+              },
+              "listeners": [
+                {
+                  "plugin.export.start": [
+                    "import_converter_customer_attribute.listeners.reduce.attribute.option.value"
+                  ]
+                }
+              ],
+              "subjects": [
+                {
+                  "id": "import_converter_customer_attribute.subject.converter",
+                  "create-imported-file": false,
+                  "file-resolver": {
+                    "prefix": "customer-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import.observer.additional.attribute",
+                        "import_converter_customer_attribute.observer.customer.to.attribute.option.value"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "add-update.options": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_attribute.subject.option",
+                  "file-resolver": {
+                    "prefix": "option-import"
+                  },
+                  "params": {
+                    "copy-images": false,
+                    "media-directory" : "pub/media/attribute/swatch",
+                    "images-file-directory" : "var/importexport/media/attribute/swatch",
+                    "clean-up-empty-columns": []
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.option.add_update"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "add-update.option-values": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_attribute.subject.option",
+                  "file-resolver": {
+                    "prefix": "option-value-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.option.value.add_update"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "add-update.address": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_customer_address.subject.bunch",
+                  "file-resolver": {
+                    "prefix": "customer-import-address"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_customer.observer.composite.address.add_update"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

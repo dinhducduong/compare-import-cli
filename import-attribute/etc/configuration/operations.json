@@ -1,0 +1,382 @@
+{
+  "operations": {
+    "general": {
+      "eav_attribute": {
+        "collect-data": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import.subject.validator",
+                  "create-imported-file": false,
+                  "file-resolver": {
+                    "prefix": "attribute-import"
+                  },
+                  "params" : {
+                    "collect-columns": [
+                      "frontend_input"
+                    ]
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.generic.column.collector"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "validate": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "listeners": [
+                {
+                  "plugin.process.success": [
+                    "import.listener.stop.validation"
+                  ]
+                }
+              ],
+              "subjects": [
+                {
+                  "id": "import.subject.validator",
+                  "create-imported-file": false,
+                  "file-resolver": {
+                    "prefix": "attribute-import"
+                  },
+                  "listeners": [
+                    {
+                      "subject.artefact.header.row.process.start": [
+                        "import.listener.validate.header.row"
+                      ]
+                    }
+                  ],
+                  "params" : {
+                    "custom-validations" : {
+                      "attribute_code": [ "/^[A-z0-9_][\\w]*$/"],
+                      "backend_type": [ "static", "varchar", "int", "text", "datetime", "decimal" ],
+                      "frontend_input" : {
+                        "multiselect": {
+                          "backend_type": ["varchar", "text"]
+                        },
+                        "select": {
+                          "backend_type": ["varchar","int"]
+                        },
+                        "text": {
+                          "backend_type": ["varchar", "text", "int", "decimal"]
+                        },
+                        "textarea": {
+                          "backend_type": ["text"]
+                        },
+                        "date": {
+                          "backend_type": ["datetime"]
+                        },
+                        "datetime": {
+                          "backend_type": ["datetime"]
+                        },
+                        "price": {
+                          "backend_type": ["decimal"]
+                        },
+                        "media_image": {
+                          "backend_type": ["varchar"]
+                        },
+                        "boolean": {
+                          "backend_type": ["int"]
+                        },
+                        "weee": {
+                          "backend_type": ["static"]
+                        }
+                      },
+                      "attribute_option_values": {
+                        "frontend_input": [
+                          "select", "multiselect", "boolean"
+                        ]
+                      }
+                    }
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.base.validate"
+                      ]
+                    }
+                  ],
+                  "callbacks": [
+                    {
+                      "store_view_code": [ "import.callback.store.view.code.validator" ],
+                      "attribute_code": [ "import.callback.custom.regex.validator" ],
+                      "entity_type_code": [ "import_attribute.callback.entity.type.code.validator" ],
+                      "attribute_set_name": [ "import_attribute.callback.attribute.set.name.validator" ],
+                      "attribute_group_name": [ "import_attribute.callback.attribute.group.name.validator" ],
+                      "backend_type": [ "import_attribute.callback.array.validator.backend.type" ],
+                      "frontend_input": [
+                        "import_attribute.callback.attribute.relation.frontend.input.type.to.backend.type.validator"
+                      ],
+                      "attribute_option_values": [
+                        "import_attribute.callback.attribute.option.values.frontend.input.type.validator",
+                        "import_attribute.callback.array.option.value.validator"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "convert": {
+          "plugins": {
+            "converter": {
+              "id": "import_converter.plugin.exportable.converter.generic",
+              "params": {
+                "exportable-artefact-types": [
+                  "option-import"
+                ]
+              },
+              "listeners": [
+                {
+                  "plugin.export.start": [
+                    "import_converter_product_attribute.listeners.reduce.attribute.option.value"
+                  ]
+                }
+              ],
+              "subjects": [
+                {
+                  "id": "import_converter_product_attribute.subject.converter",
+                  "create-imported-file": false,
+                  "file-resolver": {
+                    "prefix": "product-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import.observer.additional.attribute",
+                        "import_converter_product_attribute.observer.product.to.attribute.option.value"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "delete": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_attribute.subject.bunch",
+                  "file-resolver": {
+                    "prefix": "attribute-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.delete"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "replace": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_attribute.subject.bunch",
+                  "file-resolver": {
+                    "prefix": "attribute-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.replace"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "replace.options": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_attribute.subject.option",
+                  "file-resolver": {
+                    "prefix": "option-import"
+                  },
+                  "params": {
+                    "copy-images": false,
+                    "media-directory" : "pub/media/attribute/swatch",
+                    "images-file-directory" : "var/importexport/media/attribute/swatch",
+                    "clean-up-empty-columns": []
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.option.replace"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "replace.option-values": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_attribute.subject.option",
+                  "file-resolver": {
+                    "prefix": "option-value-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.option.value.replace"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "replace.swatch-values": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_attribute.subject.option",
+                  "file-resolver": {
+                    "prefix": "option-swatch-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.option.swatch.replace"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "add-update": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_attribute.subject.bunch",
+                  "file-resolver": {
+                    "prefix": "attribute-import"
+                  },
+                  "params": {
+                    "clean-up-empty-columns": []
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.add_update"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "add-update.options": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_attribute.subject.option",
+                  "file-resolver": {
+                    "prefix": "option-import"
+                  },
+                  "params": {
+                    "copy-images": false,
+                    "media-directory" : "pub/media/attribute/swatch",
+                    "images-file-directory" : "var/importexport/media/attribute/swatch",
+                    "clean-up-empty-columns": []
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.option.add_update"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "add-update.option-values": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_attribute.subject.option",
+                  "file-resolver": {
+                    "prefix": "option-value-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.option.value.add_update"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "add-update.swatch-values": {
+          "plugins": {
+            "subject": {
+              "id": "import.plugin.subject",
+              "subjects": [
+                {
+                  "id": "import_attribute.subject.option",
+                  "file-resolver": {
+                    "prefix": "option-swatch-import"
+                  },
+                  "observers": [
+                    {
+                      "import": [
+                        "import_attribute.observer.composite.option.swatch.add_update"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  }
+}

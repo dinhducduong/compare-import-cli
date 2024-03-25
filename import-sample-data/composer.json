@@ -1,0 +1,14 @@
+{
+    "name": "techdivision/import-sample-data",
+    "description": "Pacemaker sample data for Magento 2 Community + Commerce Edition",
+    "license": "OSL-3.0",
+    "require": {
+        "php": ">=7.1.0"
+    },
+    "authors": [
+        {
+            "name": "Tim Wagner",
+            "email": "t.wagner@techdivision.com"
+        }
+    ]
+}

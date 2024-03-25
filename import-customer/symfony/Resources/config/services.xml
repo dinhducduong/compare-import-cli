@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!--
+         | The DI utility configuration
+         |-->
+        <service id="import_customer.util.sql.compilers" class="\ArrayObject">
+            <call method="append">
+                <argument id="import.util.primary.key" type="service"/>
+            </call>
+            <call method="append">
+                <argument id="import.util.table.prefix" type="service"/>
+            </call>
+            <call method="append">
+                <argument id="import.util.column.names" type="service"/>
+            </call>
+            <call method="append">
+                <argument id="import.util.column.placeholders" type="service"/>
+            </call>
+            <call method="append">
+                <argument id="import.util.column.values" type="service"/>
+            </call>
+        </service>
+
+        <service id="import_customer.repository.sql.statement" class="TechDivision\Import\Customer\Repositories\SqlStatementRepository">
+            <argument type="service" id="import_customer.util.sql.compilers"/>
+        </service>
+        <service id="import_customer.repository.customer" class="TechDivision\Import\Customer\Repositories\CustomerRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+        </service>
+        <service id="import_customer.repository.customer.datetime" class="TechDivision\Import\Customer\Repositories\CustomerDatetimeRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+        </service>
+        <service id="import_customer.repository.customer.decimal" class="TechDivision\Import\Customer\Repositories\CustomerDecimalRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+        </service>
+        <service id="import_customer.repository.customer.int" class="TechDivision\Import\Customer\Repositories\CustomerIntRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+        </service>
+        <service id="import_customer.repository.customer.text" class="TechDivision\Import\Customer\Repositories\CustomerTextRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+        </service>
+        <service id="import_customer.repository.customer.varchar" class="TechDivision\Import\Customer\Repositories\CustomerVarcharRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+        </service>
+
+        <!--
+         | The DI action processor configuration
+         |-->
+        <service id="import_customer.action.processor.customer.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::CREATE_CUSTOMER</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::DELETE_CUSTOMER</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::UPDATE_CUSTOMER</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.datetime.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::CREATE_CUSTOMER_DATETIME</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.datetime.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::DELETE_CUSTOMER_DATETIME</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.datetime.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::UPDATE_CUSTOMER_DATETIME</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.decimal.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::CREATE_CUSTOMER_DECIMAL</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.decimal.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::DELETE_CUSTOMER_DECIMAL</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.decimal.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::UPDATE_CUSTOMER_DECIMAL</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.int.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::CREATE_CUSTOMER_INT</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.int.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::DELETE_CUSTOMER_INT</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.int.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::UPDATE_CUSTOMER_INT</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.text.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::CREATE_CUSTOMER_TEXT</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.text.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::DELETE_CUSTOMER_TEXT</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.text.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::UPDATE_CUSTOMER_TEXT</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.varchar.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::CREATE_CUSTOMER_VARCHAR</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.varchar.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::DELETE_CUSTOMER_VARCHAR</argument>
+            </argument>
+        </service>
+        <service id="import_customer.action.processor.customer.varchar.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Customer\Utils\SqlStatementKeys::UPDATE_CUSTOMER_VARCHAR</argument>
+            </argument>
+        </service>
+
+        <service id="import_customer.action.customer" class="TechDivision\Import\Dbal\Collection\Actions\GenericIdentifierAction">
+            <argument type="service" id="import_customer.action.processor.customer.create"/>
+            <argument type="service" id="import_customer.action.processor.customer.update"/>
+            <argument type="service" id="import_customer.action.processor.customer.delete"/>
+            <argument type="constant">TechDivision\Import\Customer\Utils\MemberNames::ENTITY_ID</argument>
+        </service>
+        <service id="import_customer.action.customer.datetime" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_customer.action.processor.customer.datetime.create"/>
+            <argument type="service" id="import_customer.action.processor.customer.datetime.update"/>
+            <argument type="service" id="import_customer.action.processor.customer.datetime.delete"/>
+        </service>
+        <service id="import_customer.action.customer.decimal" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_customer.action.processor.customer.decimal.create"/>
+            <argument type="service" id="import_customer.action.processor.customer.decimal.update"/>
+            <argument type="service" id="import_customer.action.processor.customer.decimal.delete"/>
+        </service>
+        <service id="import_customer.action.customer.int" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_customer.action.processor.customer.int.create"/>
+            <argument type="service" id="import_customer.action.processor.customer.int.update"/>
+            <argument type="service" id="import_customer.action.processor.customer.int.delete"/>
+        </service>
+        <service id="import_customer.action.customer.text" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_customer.action.processor.customer.text.create"/>
+            <argument type="service" id="import_customer.action.processor.customer.text.update"/>
+            <argument type="service" id="import_customer.action.processor.customer.text.delete"/>
+        </service>
+        <service id="import_customer.action.customer.varchar" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_customer.action.processor.customer.varchar.create"/>
+            <argument type="service" id="import_customer.action.processor.customer.varchar.update"/>
+            <argument type="service" id="import_customer.action.processor.customer.varchar.delete"/>
+        </service>
+
+        <service id="import_customer.assembler.customer.attribute" class="TechDivision\Import\Customer\Assemblers\CustomerAttributeAssembler">
+            <argument type="service" id="import_customer.repository.customer.datetime"/>
+            <argument type="service" id="import_customer.repository.customer.decimal"/>
+            <argument type="service" id="import_customer.repository.customer.int"/>
+            <argument type="service" id="import_customer.repository.customer.text"/>
+            <argument type="service" id="import_customer.repository.customer.varchar"/>
+        </service>
+
+        <service id="import_customer.processor.customer.bunch" class="TechDivision\Import\Customer\Services\CustomerBunchProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_customer.assembler.customer.attribute"/>
+            <argument type="service" id="import.repository.eav.attribute.option.value"/>
+            <argument type="service" id="import.repository.eav.attribute"/>
+            <argument type="service" id="import_customer.repository.customer"/>
+            <argument type="service" id="import.repository.eav.entity.type"/>
+            <argument type="service" id="import_customer.action.customer"/>
+            <argument type="service" id="import_customer.action.customer.datetime"/>
+            <argument type="service" id="import_customer.action.customer.decimal"/>
+            <argument type="service" id="import_customer.action.customer.int"/>
+            <argument type="service" id="import_customer.action.customer.text"/>
+            <argument type="service" id="import_customer.action.customer.varchar"/>
+            <argument type="service" id="import.loader.raw.entity"/>
+        </service>
+
+        <service id="import_customer.observer.clean.up" class="TechDivision\Import\Customer\Observers\CleanUpObserver">
+            <argument type="service" id="import_customer.processor.customer.bunch"/>
+        </service>
+        <service id="import_customer.observer.customer.attribute" class="TechDivision\Import\Customer\Observers\CustomerAttributeObserver">
+            <argument type="service" id="import_customer.processor.customer.bunch"/>
+        </service>
+        <service id="import_customer.observer.customer.attribute.update" class="TechDivision\Import\Customer\Observers\CustomerAttributeUpdateObserver">
+            <argument type="service" id="import_customer.processor.customer.bunch"/>
+        </service>
+        <service id="import_customer.observer.customer" class="TechDivision\Import\Customer\Observers\CustomerObserver">
+            <argument type="service" id="import_customer.processor.customer.bunch"/>
+        </service>
+        <service id="import_customer.observer.last.entity.id" class="TechDivision\Import\Customer\Observers\LastEntityIdObserver">
+            <argument type="service" id="import_customer.processor.customer.bunch"/>
+        </service>
+        <service id="import_customer.observer.clear.customer" class="TechDivision\Import\Customer\Observers\ClearCustomerObserver">
+            <argument type="service" id="import_customer.processor.customer.bunch"/>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the customer replace operation.
+         |-->
+        <service id="import_customer.observer.composite.replace" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_customer.observer.last.entity.id" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer.observer.clear.customer" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer.observer.customer" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer.observer.customer.attribute" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.export.customer.address" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer.observer.clean.up" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the customer address replace operation.
+         |-->
+        <service id="import_customer.observer.composite.address.replace" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.customer.address" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.customer.address.attribute" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.default.billing.address" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.default.shipping.address" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.clean.up" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the customer add-update operation.
+         |-->
+        <service id="import_customer.observer.composite.add_update" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_customer.observer.customer" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer.observer.customer.attribute.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.export.customer.address" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer.observer.clean.up" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the customer address add-update operation.
+         |-->
+        <service id="import_customer.observer.composite.address.add_update" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.customer.address" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.customer.address.attribute.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.default.billing.address" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.default.shipping.address" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_customer_address.observer.clean.up" type="service"/>
+            </call>
+        </service>
+
+        <service id="import_customer.subject.bunch" class="TechDivision\Import\Customer\Subjects\BunchSubject" shared="false">
+            <argument type="service" id="import.processor.registry"/>
+            <argument type="service" id="import.generator.core.config.data.uid"/>
+            <argument type="service" id="loggers"/>
+            <argument type="service" id="import.events.emitter"/>
+        </service>
+
+        <!--
+         | The DI callback configuration callbacks
+         |-->
+        <service id="import_customer.callback.boolean" class="TechDivision\Import\Customer\Callbacks\BooleanCallback"/>
+        <service id="import_customer.callback.multiselect" class="TechDivision\Import\Customer\Callbacks\MultiselectCallback">
+            <argument type="service" id="configuration"/>
+            <argument type="service" id="import_customer.processor.customer.bunch"/>
+        </service>
+        <service id="import_customer.callback.select" class="TechDivision\Import\Customer\Callbacks\SelectCallback">
+            <argument type="service" id="configuration"/>
+            <argument type="service" id="import_customer.processor.customer.bunch"/>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the validation operation.
+         |-->
+        <service id="import_customer.observer.composite.base.validate" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import.observer.additional.attribute" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import.observer.generic.validator" type="service"/>
+            </call>
+        </service>
+
+    </services>
+
+</container>

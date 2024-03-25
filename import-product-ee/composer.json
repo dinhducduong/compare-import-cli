@@ -1,0 +1,44 @@
+{
+    "name": "techdivision/import-product-ee",
+    "description": "Pacemaker library providing basic Magento 2 EE product import functionality",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.3.0",
+        "techdivision/import-ee": "^16.0.0",
+        "techdivision/import-product": "^25.0.0"
+    },
+    "require-dev": {
+        "doctrine/dbal": "2.5.*",
+        "pdepend/pdepend": "2.5.2",
+        "phpmd/phpmd": "@stable",
+        "phpunit/phpunit": "^6.5.0|^8.0.0|~9.5.0",
+        "sebastian/phpcpd": "~3.0|~4.0|~5.0|~6.0",
+        "squizlabs/php_codesniffer": "~3.4.0|~3.6.0",
+        "consolidation/robo": "~1.0",
+        "mikey179/vfsstream": "~1.0",
+        "symfony/http-kernel": "~2.0|~3.0|~4.0"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "authors": [
+        {
+            "name": "Tim Wagner",
+            "email": "t.wagner@techdivision.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "TechDivision\\Import\\Product\\Ee\\": [
+                "src/",
+                "symfony/"
+            ]
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TechDivision\\Import\\Product\\Ee\\": [
+                "tests/unit"
+            ]
+        }
+    }
+}

@@ -1,0 +1,654 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+
+        <!--
+         | The DI configuration for the header mapping loader
+         |-->
+        <service id="import_attribute.loader.header.mapping.catalog.attribute" class="TechDivision\Import\Loaders\EntityTypeHeaderMappingLoader">
+            <argument type="service" id="import.loader.header.mapping"/>
+            <argument type="constant">TechDivision\Import\Attribute\Utils\EntityTypeCodes::CATALOG_EAV_ATTRIBUTE</argument>
+        </service>
+
+        <!--
+         | The DI configuration for the entity mergers
+         |-->
+        <service id="import_attribute.loader.header.mapping.attribute.option" class="TechDivision\Import\Loaders\EntityTypeHeaderMappingLoader">
+            <argument type="service" id="import.loader.header.mapping"/>
+            <argument type="constant">TechDivision\Import\Attribute\Utils\EntityTypeCodes::EAV_ATTRIBUTE_OPTION</argument>
+        </service>
+        <service id="import_attribute.loader.header.mapping.entity.attribute" class="TechDivision\Import\Loaders\EntityTypeHeaderMappingLoader">
+            <argument type="service" id="import.loader.header.mapping"/>
+            <argument type="constant">TechDivision\Import\Attribute\Utils\EntityTypeCodes::EAV_ENTITY_ATTRIBUTTE</argument>
+        </service>
+        <service id="import_attribute.loader.header.mapping.catalog.attribute" class="TechDivision\Import\Loaders\EntityTypeHeaderMappingLoader">
+            <argument type="service" id="import.loader.header.mapping"/>
+            <argument type="constant">TechDivision\Import\Attribute\Utils\EntityTypeCodes::CATALOG_EAV_ATTRIBUTE</argument>
+        </service>
+        <service id="import_attribute.loader.frontend.input" class="TechDivision\Import\Attribute\Loaders\AttributeValueLoader">
+            <argument type="service" id="import.loader.registry.custom.columns"/>
+            <argument type="constant">\TechDivision\Import\Attribute\Utils\MemberNames::FRONTEND_INPUT</argument>
+        </service>
+        <service id="import_attribute.loader.backend.type" class="TechDivision\Import\Attribute\Loaders\AttributeValueLoader">
+            <argument type="service" id="import.loader.registry.custom.columns"/>
+            <argument type="constant">\TechDivision\Import\Attribute\Utils\MemberNames::BACKEND_TYPE</argument>
+        </service>
+
+        <service id="import_attribute.entity.merger.empty.columns.attribute.option" class="TechDivision\Import\Observers\EntityMergers\CleanUpColumnsEntityMerger">
+            <argument type="service" id="import_attribute.loader.header.mapping.attribute.option"/>
+        </service>
+        <service id="import_attribute.entity.merger.empty.columns.entity.attribute" class="TechDivision\Import\Observers\EntityMergers\CleanUpColumnsEntityMerger">
+            <argument type="service" id="import_attribute.loader.header.mapping.entity.attribute"/>
+        </service>
+        <service id="import_attribute.entity.merger.empty.columns.catalog.attribute" class="TechDivision\Import\Observers\EntityMergers\CleanUpColumnsEntityMerger">
+            <argument type="service" id="import_attribute.loader.header.mapping.catalog.attribute"/>
+        </service>
+        <service id="import_attribute.entity.merger.composite.attribute.option" class="TechDivision\Import\Observers\EntityMergers\GenericCompositeEntityMerger">
+            <call method="append">
+                <argument type="service" id="import_attribute.entity.merger.empty.columns.attribute.option"/>
+            </call>
+        </service>
+        <service id="import_attribute.entity.merger.composite.entity.attribute" class="TechDivision\Import\Observers\EntityMergers\GenericCompositeEntityMerger">
+            <call method="append">
+                <argument type="service" id="import_attribute.entity.merger.empty.columns.entity.attribute"/>
+            </call>
+        </service>
+        <service id="import_attribute.entity.merger.composite.catalog.attribute" class="TechDivision\Import\Observers\EntityMergers\GenericCompositeEntityMerger">
+            <call method="append">
+                <argument type="service" id="import_attribute.entity.merger.empty.columns.catalog.attribute"/>
+            </call>
+        </service>
+
+        <service id="import_attribute.repository.sql.statement" class="TechDivision\Import\Attribute\Repositories\SqlStatementRepository">
+            <argument type="service" id="import.util.sql.compilers"/>
+        </service>
+        <service id="import_attribute.repository.attribute" class="TechDivision\Import\Attribute\Repositories\AttributeRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+        </service>
+        <service id="import_attribute.repository.attribute.label" class="TechDivision\Import\Attribute\Repositories\AttributeLabelRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+        </service>
+        <service id="import_attribute.repository.attribute.option" class="TechDivision\Import\Attribute\Repositories\AttributeOptionRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+        </service>
+        <service id="import_attribute.repository.attribute.option.swatch" class="TechDivision\Import\Attribute\Repositories\AttributeOptionSwatchRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+        </service>
+        <service id="import_attribute.repository.catalog.attribute" class="TechDivision\Import\Attribute\Repositories\CatalogAttributeRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+        </service>
+        <service id="import_attribute.repository.entity.attribute" class="TechDivision\Import\Attribute\Repositories\EntityAttributeRepository">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+        </service>
+
+        <service id="import_attribute.action.processor.attribute.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::CREATE_ATTRIBUTE</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::UPDATE_ATTRIBUTE</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::DELETE_ATTRIBUTE</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.label.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::CREATE_ATTRIBUTE_LABEL</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.label.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::UPDATE_ATTRIBUTE_LABEL</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.label.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::DELETE_ATTRIBUTE_LABEL</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.option.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::CREATE_ATTRIBUTE_OPTION</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.option.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericIdentifierProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::UPDATE_ATTRIBUTE_OPTION</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.option.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::DELETE_ATTRIBUTE_OPTION</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.option.value.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::CREATE_ATTRIBUTE_OPTION_VALUE</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.option.value.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::UPDATE_ATTRIBUTE_OPTION_VALUE</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.option.value.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::DELETE_ATTRIBUTE_OPTION_VALUE</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.option.swatch.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::CREATE_ATTRIBUTE_OPTION_SWATCH</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.option.swatch.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::UPDATE_ATTRIBUTE_OPTION_SWATCH</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.attribute.option.swatch.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::DELETE_ATTRIBUTE_OPTION_SWATCH</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.entity.attribute.create" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::CREATE_ENTITY_ATTRIBUTE</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.entity.attribute.update" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::UPDATE_ENTITY_ATTRIBUTE</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.entity.attribute.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::DELETE_ENTITY_ATTRIBUTE</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.catalog.attribute.delete" class="TechDivision\Import\Dbal\Collection\Actions\Processors\GenericProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+            <argument type="collection">
+                <argument type="constant">TechDivision\Import\Attribute\Utils\SqlStatementKeys::DELETE_CATALOG_ATTRIBUTE</argument>
+            </argument>
+        </service>
+        <service id="import_attribute.action.processor.catalog.attribute.create" class="TechDivision\Import\Attribute\Actions\Processors\CatalogAttributeCreateProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+        </service>
+        <service id="import_attribute.action.processor.catalog.attribute.update" class="TechDivision\Import\Attribute\Actions\Processors\CatalogAttributeUpdateProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.sql.statement"/>
+            <argument type="service" id="import.util.sql.sanitizers"/>
+        </service>
+
+        <service id="import_attribute.action.attribute" class="TechDivision\Import\Dbal\Collection\Actions\GenericIdentifierAction">
+            <argument type="service" id="import_attribute.action.processor.attribute.create"/>
+            <argument type="service" id="import_attribute.action.processor.attribute.update"/>
+            <argument type="service" id="import_attribute.action.processor.attribute.delete"/>
+            <argument type="constant">TechDivision\Import\Attribute\Utils\MemberNames::ATTRIBUTE_ID</argument>
+        </service>
+        <service id="import_attribute.action.attribute.option" class="TechDivision\Import\Dbal\Collection\Actions\GenericIdentifierAction">
+            <argument type="service" id="import_attribute.action.processor.attribute.option.create"/>
+            <argument type="service" id="import_attribute.action.processor.attribute.option.update"/>
+            <argument type="service" id="import_attribute.action.processor.attribute.option.delete"/>
+            <argument type="constant">TechDivision\Import\Attribute\Utils\MemberNames::OPTION_ID</argument>
+        </service>
+        <service id="import_attribute.action.attribute.label" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_attribute.action.processor.attribute.label.create"/>
+            <argument type="service" id="import_attribute.action.processor.attribute.label.update"/>
+            <argument type="service" id="import_attribute.action.processor.attribute.label.delete"/>
+        </service>
+        <service id="import_attribute.action.attribute.option.value" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_attribute.action.processor.attribute.option.value.create"/>
+            <argument type="service" id="import_attribute.action.processor.attribute.option.value.update"/>
+            <argument type="service" id="import_attribute.action.processor.attribute.option.value.delete"/>
+        </service>
+        <service id="import_attribute.action.attribute.option.swatch" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_attribute.action.processor.attribute.option.swatch.create"/>
+            <argument type="service" id="import_attribute.action.processor.attribute.option.swatch.update"/>
+            <argument type="service" id="import_attribute.action.processor.attribute.option.swatch.delete"/>
+        </service>
+        <service id="import_attribute.action.catalog.attribute" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_attribute.action.processor.catalog.attribute.create"/>
+            <argument type="service" id="import_attribute.action.processor.catalog.attribute.update"/>
+            <argument type="service" id="import_attribute.action.processor.catalog.attribute.delete"/>
+        </service>
+        <service id="import_attribute.action.entity.attribute" class="TechDivision\Import\Dbal\Collection\Actions\GenericAction">
+            <argument type="service" id="import_attribute.action.processor.entity.attribute.create"/>
+            <argument type="service" id="import_attribute.action.processor.entity.attribute.update"/>
+            <argument type="service" id="import_attribute.action.processor.entity.attribute.delete"/>
+        </service>
+
+        <service id="import_attribute.observer.attribute.clean.up" class="TechDivision\Import\Attribute\Observers\AttributeCleanUpObserver"/>
+        <service id="import_attribute.observer.attribute.option.export" class="TechDivision\Import\Attribute\Observers\AttributeOptionExportObserver"/>
+        <service id="import_attribute.observer.attribute.option.value.export" class="TechDivision\Import\Attribute\Observers\AttributeOptionValueExportObserver"/>
+        <service id="import_attribute.observer.attribute.option.swatch.export" class="TechDivision\Import\Attribute\Observers\AttributeOptionSwatchExportObserver"/>
+        <service id="import_attribute.observer.pre.load.attribute.id" class="TechDivision\Import\Attribute\Observers\PreLoadAttributeIdObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.pre.load.attribute.option.id" class="TechDivision\Import\Attribute\Observers\PreLoadAttributeOptionIdObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.attribute" class="TechDivision\Import\Attribute\Observers\AttributeObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.attribute.update" class="TechDivision\Import\Attribute\Observers\AttributeUpdateObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.attribute.label" class="TechDivision\Import\Attribute\Observers\AttributeLabelObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.attribute.label.update" class="TechDivision\Import\Attribute\Observers\AttributeLabelUpdateObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.catalog.attribute" class="TechDivision\Import\Attribute\Observers\CatalogAttributeObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+            <argument type="service" id="import_attribute.entity.merger.composite.catalog.attribute"/>
+            <argument type="service" id="import_attribute.loader.header.mapping.catalog.attribute"/>
+        </service>
+        <service id="import_attribute.observer.catalog.attribute.update" class="TechDivision\Import\Attribute\Observers\CatalogAttributeUpdateObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+            <argument type="service" id="import_attribute.entity.merger.composite.catalog.attribute"/>
+            <argument type="service" id="import_attribute.loader.header.mapping.catalog.attribute"/>
+        </service>
+        <service id="import_attribute.observer.clear.attribute" class="TechDivision\Import\Attribute\Observers\ClearAttributeObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.attribute.option" class="TechDivision\Import\Attribute\Observers\AttributeOptionObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+            <argument type="service" id="import.observer.dynamic.attribute.loader"/>
+            <argument type="service" id="import_attribute.entity.merger.composite.attribute.option"/>
+        </service>
+        <service id="import_attribute.observer.attribute.option.update" class="TechDivision\Import\Attribute\Observers\AttributeOptionUpdateObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+            <argument type="service" id="import.observer.dynamic.attribute.loader"/>
+            <argument type="service" id="import_attribute.entity.merger.composite.attribute.option"/>
+        </service>
+        <service id="import_attribute.observer.attribute.option.value" class="TechDivision\Import\Attribute\Observers\AttributeOptionValueObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.attribute.option.value.update" class="TechDivision\Import\Attribute\Observers\AttributeOptionValueUpdateObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.attribute.option.swatch" class="TechDivision\Import\Attribute\Observers\AttributeOptionSwatchObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.attribute.option.swatch.update" class="TechDivision\Import\Attribute\Observers\AttributeOptionSwatchUpdateObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.attribute.option.swatch.file_upload" class="TechDivision\Import\Attribute\Observers\AttributeOptionSwatchFileUploadObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.entity.attribute" class="TechDivision\Import\Attribute\Observers\EntityAttributeObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+            <argument type="service" id="import_attribute.entity.merger.composite.entity.attribute"/>
+        </service>
+        <service id="import_attribute.observer.entity.attribute.update" class="TechDivision\Import\Attribute\Observers\EntityAttributeUpdateObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+            <argument type="service" id="import_attribute.entity.merger.composite.entity.attribute"/>
+        </service>
+        <service id="import_attribute.observer.attribute.option.default" class="TechDivision\Import\Attribute\Observers\AttributeDefaultOptionObserver">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.observer.generic.column.collector" class="TechDivision\Import\Observers\GenericIndexedColumnCollectorObserver">
+            <argument type="service" id="import.loader.collect.columns"/>
+            <argument type="service" id="import.processor.registry"/>
+            <argument>%array_validator.nullable.true%</argument>
+        </service>
+
+        <!--
+         | The DI configuration for the callbacks.
+         |-->
+        <service id="import_attribute.callback.attribute.set.name.validator" class="TechDivision\Import\Attribute\Callbacks\AttributeSetNamesValidatorCallback">
+            <argument type="service" id="import.loader.attribute.set.name"/>
+            <argument>%array_validator.nullable.false%</argument>
+            <argument>%array_validator.nullable.true%</argument>
+        </service>
+        <service id="import_attribute.callback.attribute.group.name.validator" class="TechDivision\Import\Attribute\Callbacks\AttributeGroupNamesValidatorCallback">
+            <argument type="service" id="import.loader.attribute.group.name"/>
+            <argument>%array_validator.nullable.false%</argument>
+            <argument>%array_validator.nullable.true%</argument>
+        </service>
+        <service id="import_attribute.callback.array.validator.backend.type" class="TechDivision\Import\Callbacks\IndexedArrayValidatorCallback">
+            <argument type="service" id="import.loader.custom.validations"/>
+            <argument>%array_validator.nullable.false%</argument>
+            <argument>%array_validator.nullable.true%</argument>
+        </service>
+        <service id="import_attribute.callback.entity.type.code.validator" class="TechDivision\Import\Callbacks\ArrayValidatorCallback">
+            <argument type="service" id="import.loader.entity.type.code"/>
+            <argument>%array_validator.nullable.false%</argument>
+            <argument>%array_validator.nullable.true%</argument>
+        </service>
+        <service id="import_attribute.callback.array.validator.frontend.input" class="TechDivision\Import\Callbacks\IndexedArrayValidatorCallback">
+            <argument type="service" id="import.loader.custom.validations"/>
+            <argument>%array_validator.nullable.false%</argument>
+            <argument>%array_validator.nullable.true%</argument>
+        </service>
+        <service id="import_attribute.callback.attribute.option.values.frontend.input.type.validator" class="TechDivision\Import\Attribute\Callbacks\AttributeOptionValuesFrontendInputTypeValidatorCallback">
+            <argument type="service" id="import.loader.custom.validations"/>
+            <argument type="service" id="import_attribute.loader.frontend.input"/>
+            <argument>%array_validator.nullable.true%</argument>
+            <argument>%array_validator.nullable.false%</argument>
+        </service>
+        <service id="import_attribute.callback.array.option.value.validator" class="TechDivision\Import\Callbacks\EmptyValueValidatorCallback">
+            <argument type="service" id="import.loader.custom.validations"/>
+            <argument>%array_validator.nullable.true%</argument>
+            <argument>%array_validator.nullable.false%</argument>
+        </service>
+        <service id="import_attribute.callback.attribute.relation.frontend.input.type.to.backend.type.validator" class="TechDivision\Import\Attribute\Callbacks\AttributeRelationFrontendInputTypeToBackendTypeValidatorCallback">
+            <argument type="service" id="import.loader.custom.validations"/>
+            <argument type="service" id="import_attribute.loader.backend.type"/>
+            <argument>%array_validator.nullable.true%</argument>
+            <argument>%array_validator.nullable.false%</argument>
+        </service>
+        <!--
+         | The DI configuration for the composite observers of the validation operation.
+         |-->
+        <service id="import_attribute.observer.composite.base.validate" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import.observer.generic.validator" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the attribute replace operation.
+         |-->
+        <service id="import_attribute.observer.composite.replace" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_attribute.observer.pre.load.attribute.id" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.clear.attribute" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.label" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.entity.attribute" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.catalog.attribute" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.export" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.value.export" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.swatch.export" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.clean.up" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the attribute option replace operation.
+         |-->
+        <service id="import_attribute.observer.composite.option.replace" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.value" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.swatch" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.default" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.swatch.file_upload" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the attribute option value replace operation.
+         |-->
+        <service id="import_attribute.observer.composite.option.value.replace" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_attribute.observer.pre.load.attribute.option.id" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.value" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the attribute option swatch replace operation.
+         |-->
+        <service id="import_attribute.observer.composite.option.swatch.replace" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_attribute.observer.pre.load.attribute.option.id" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.swatch" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the attribute add-update operation.
+         |-->
+        <service id="import_attribute.observer.composite.add_update" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.label.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.entity.attribute.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.catalog.attribute.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.export" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.value.export" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.swatch.export" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.clean.up" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the attribute option add-update operation.
+         |-->
+        <service id="import_attribute.observer.composite.option.add_update" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.value.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.swatch.update" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.default" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.swatch.file_upload" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the attribute option value add-update operation.
+         |-->
+        <service id="import_attribute.observer.composite.option.value.add_update" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_attribute.observer.pre.load.attribute.option.id" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.value.update" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the attribute option swatch add-update operation.
+         |-->
+        <service id="import_attribute.observer.composite.option.swatch.add_update" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_attribute.observer.pre.load.attribute.option.id" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.option.swatch.update" type="service"/>
+            </call>
+        </service>
+
+        <!--
+         | The DI configuration for the composite observers of the attribute delete operation.
+         |-->
+        <service id="import_attribute.observer.composite.delete" class="TechDivision\Import\Observers\GenericCompositeObserver">
+            <call method="addObserver">
+                <argument id="import_attribute.observer.pre.load.attribute.id" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.clear.attribute" type="service"/>
+            </call>
+            <call method="addObserver">
+                <argument id="import_attribute.observer.attribute.clean.up" type="service"/>
+            </call>
+        </service>
+
+        <service id="import_attribute.loader.raw.entity" class="TechDivision\Import\Attribute\Loaders\RawEntityLoader">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import.loader.column.metadata"/>
+            <argument type="service" id="import.loader.raw.entity"/>
+        </service>
+
+        <service id="import_attribute.processor.attribute.bunch" class="TechDivision\Import\Attribute\Services\AttributeBunchProcessor">
+            <argument type="service" id="connection"/>
+            <argument type="service" id="import_attribute.repository.attribute"/>
+            <argument type="service" id="import_attribute.repository.attribute.label"/>
+            <argument type="service" id="import_attribute.repository.attribute.option"/>
+            <argument type="service" id="import.repository.eav.attribute.option.value"/>
+            <argument type="service" id="import_attribute.repository.attribute.option.swatch"/>
+            <argument type="service" id="import_attribute.repository.catalog.attribute"/>
+            <argument type="service" id="import_attribute.repository.entity.attribute"/>
+            <argument type="service" id="import.repository.eav.entity.type"/>
+            <argument type="service" id="import_attribute.action.attribute"/>
+            <argument type="service" id="import_attribute.action.attribute.label"/>
+            <argument type="service" id="import_attribute.action.attribute.option"/>
+            <argument type="service" id="import_attribute.action.attribute.option.value"/>
+            <argument type="service" id="import_attribute.action.attribute.option.swatch"/>
+            <argument type="service" id="import_attribute.action.catalog.attribute"/>
+            <argument type="service" id="import_attribute.action.entity.attribute"/>
+            <argument type="service" id="import_attribute.loader.raw.entity"/>
+        </service>
+
+        <service id="import_attribute.subject.bunch" class="TechDivision\Import\Attribute\Subjects\BunchSubject" shared="false">
+            <argument type="service" id="import.processor.registry"/>
+            <argument type="service" id="import.generator.core.config.data.uid"/>
+            <argument type="service" id="loggers"/>
+            <argument type="service" id="import.events.emitter"/>
+        </service>
+
+        <service id="import_attribute.subject.option" class="TechDivision\Import\Attribute\Subjects\OptionSubject" shared="false">
+            <argument type="service" id="import.processor.registry"/>
+            <argument type="service" id="import.generator.core.config.data.uid"/>
+            <argument type="service" id="loggers"/>
+            <argument type="service" id="import.events.emitter"/>
+        </service>
+
+        <service id="import_attribute.callback.swatch.type.loader" class="TechDivision\Import\Attribute\Callbacks\SwatchTypeLoader">
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+        </service>
+        <service id="import_attribute.callback.option.value.and.swatch.handler" class="TechDivision\Import\Attribute\Callbacks\OptionValueAndSwatchHandler">
+            <argument type="service" id="configuration"/>
+            <argument type="service" id="loggers"/>
+            <argument type="service" id="import_attribute.processor.attribute.bunch"/>
+            <argument type="service" id="import_attribute.callback.swatch.type.loader"/>
+        </service>
+        <service id="import_attribute.callback.create.select.option.value" class="TechDivision\Import\Attribute\Callbacks\CreateSelectOptionValueCallback">
+            <argument type="service" id="import_attribute.callback.option.value.and.swatch.handler"/>
+        </service>
+        <service id="import_attribute.callback.create.multiselect.option.value" class="TechDivision\Import\Attribute\Callbacks\CreateMultiselectOptionValueCallback">
+            <argument type="service" id="import_attribute.callback.option.value.and.swatch.handler"/>
+        </service>
+
+    </services>
+
+</container>
